@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Invitación - {{ invitacion.titulo }}</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        /* Contenedores de las imágenes */
+        .bottle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bottle-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            transition: opacity 0.2s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #bottle-closed {
+            z-index: 2;
+            opacity: 1;
+            cursor: pointer;
+        }
+
+        #bottle-open {
+            z-index: 1;
+            opacity: 0;
+        }
+
+        .open-btn-container {
+            position: absolute;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            width: 100%;
+            text-align: center;
+        }
+
+        .open-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Cinzel', serif;
+            font-size: clamp(0.7rem, 2vw, 1rem);
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #000;
+            background: linear-gradient(135deg, #ffffff 0%, #f5e8d0 100%);
+            padding: 15px 40px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .open-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 255, 255, 0.6);
+        }
+
+        /* Animación Shake CSS */
+        .shake-animation {
+            animation: shake 0.8s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-3px, 0, 0) rotate(-1deg); }
+            20%, 80% { transform: translate3d(5px, 0, 0) rotate(2deg); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0) rotate(-2deg); }
+            40%, 60% { transform: translate3d(8px, 0, 0) rotate(2deg); }
+        }
+
+        /* Destello al estallar */
+        #flash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 20;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Transición a la página real */
+        #fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+            transition: opacity 1.5s ease;
+        }
+
+        /* Canvas chispas extra */
+        #sparkles-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bottle-container">
+        <!-- Imagen B (Abierta) -->
+        <img id="bottle-open" src="{% if invitacion.sello_portada_url %}/static/{{ invitacion.sello_portada_url }}{% else %}/static/assets/portada-sobre-bg.png{% endif %}" alt="Champagne Abierta" class="bottle-img">
+        
+        <!-- Imagen A (Cerrada) -->
+        <img id="bottle-closed" src="{% if invitacion.fondo_portada_url %}/static/{{ invitacion.fondo_portada_url }}{% else %}/static/assets/portada-sobre-bg.png{% endif %}" alt="Champagne Cerrada" class="bottle-img">
+    </div>
+
+    <div class="open-btn-container" id="tap-text">
+        <button class="open-btn" onclick="popChampagne()">
+            <i class="fas fa-glass-cheers"></i> Abrir Invitación
+        </button>
+    </div>
+
+    <canvas id="sparkles-canvas"></canvas>
+
+    <div id="flash-overlay"></div>
+    <div id="fade-overlay"></div>
+
+    <!-- Sonido de Descorche real y confiable -->
+    <audio id="pop-sound" preload="auto">
+        <source src="https://actions.google.com/sounds/v1/household/cork_pop.ogg" type="audio/ogg">
+    </audio>
+
+    <script>
+        const canvas = document.getElementById('sparkles-canvas');
+        const ctx = canvas.getContext('2d');
+        let W, H, particles = [];
+
+        function resize() {
+            W = canvas.width = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class EspumaBubble {
+            constructor(x, y) {
+                this.x = x + (Math.random() - 0.5) * 120; // Spread mucho más ancho
+                this.y = y;
+                // Velocidad de explosión masiva hacia arriba y los lados
+                this.vx = (Math.random() - 0.5) * 35;
+                this.vy = -(Math.random() * 40 + 15);
+                this.r = Math.random() * 12 + 6; // Burbujas gigantes
+                this.alpha = 0.9;
+                this.growth = Math.random() * 0.8 + 0.2; // Crecimiento masivo
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // Gravedad suave (la espuma flota más y cae lento)
+                this.vy += 0.4; 
+                
+                // Fricción horizontal (se detienen a los lados)
+                this.vx *= 0.95;
+                
+                // Crecen mientras caen
+                this.r += this.growth;
+                
+                // Desaparecen poco a poco
+                this.alpha -= 0.01;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.alpha);
+                
+                // Colores de espuma: blanco puro y rosado champán muy claro
+                ctx.fillStyle = Math.random() > 0.4 ? '#ffffff' : '#ffebef';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#ffffff';
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function animateSparkles() {
+            ctx.clearRect(0, 0, W, H);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].alpha <= 0) particles.splice(i, 1);
+            }
+            if (particles.length > 0) {
+                requestAnimationFrame(animateSparkles);
+            }
+        }
+
+        let opened = false;
+        function popChampagne() {
+            if (opened) return;
+            opened = true;
+
+            const bottleClosed = document.getElementById('bottle-closed');
+            const bottleOpen = document.getElementById('bottle-open');
+            const tapText = document.getElementById('tap-text');
+            const flash = document.getElementById('flash-overlay');
+            const popSound = document.getElementById('pop-sound');
+
+            tapText.style.display = 'none';
+
+            // 1. Agitar
+            bottleClosed.classList.add('shake-animation');
+            
+            // Iniciar sonido (Forzamos volumen máximo)
+            popSound.volume = 1.0;
+            popSound.play().catch(e => console.log('Autoplay audio bloqueado:', e));
+
+            // Esperar a que la animación de agitar casi termine (800ms)
+            setTimeout(() => {
+                // 2. Flash y Explosión
+                flash.style.opacity = '1';
+                
+                // Crear muchísima espuma volcánica desde el cuello de la botella
+                // 600 partículas para crear una fuente densa de líquido
+                for (let i = 0; i < 600; i++) {
+                    particles.push(new EspumaBubble(W/2, H * 0.30));
+                }
+                animateSparkles();
+
+                // 3. Intercambiar imágenes rápidamente
+                setTimeout(() => {
+                    bottleClosed.style.opacity = '0';
+                    bottleOpen.style.opacity = '1';
+                    flash.style.opacity = '0';
+
+                    // 4. Esperar 3.5 segundos para admirar la invitación y luego redirigir
+                    setTimeout(() => {
+                        document.getElementById('fade-overlay').style.opacity = '1';
+                        setTimeout(() => {
+                            window.location.href = '/invitacion/{{ invitado.uuid }}/detalles?autoplay=1';
+                        }, 1200);
+                    }, 3500);
+
+                }, 100); 
+            }, 750);
+        }
+    </script>
+</body>
+</html>

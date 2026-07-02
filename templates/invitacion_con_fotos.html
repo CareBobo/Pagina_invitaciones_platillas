@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Invitación - {{ invitacion.titulo }}</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #1f1e1c; /* Fondo oscuro elegante */
+            --text-primary: #fcfcfc; /* Texto claro */
+            --text-secondary: #c4c4c4;
+            --accent-color: #7b8f74; /* Verde eucalipto sutil */
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --gold: #d4af37;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            text-align: center;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .main-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: var(--bg-color);
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        /* --- DECORACIONES SUPERIORES --- */
+        .top-decor {
+            width: 100%;
+            height: auto;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+
+        h1.names {
+            font-family: var(--font-serif);
+            font-size: 3rem;
+            color: var(--text-primary);
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        p.subtitle {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        /* --- REPRODUCTOR DE MÚSICA INLINE --- */
+        .inline-player {
+            margin: 20px auto 40px;
+            text-align: center;
+        }
+        .music-suggestions {
+            padding: 20px;
+            border: 1px solid var(--gold);
+            border-radius: 12px;
+            background-color: rgba(255,255,255,0.05);
+        }
+        .inline-player-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        .inline-player-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            color: var(--text-secondary);
+        }
+        .btn-play-heart {
+            background: none;
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-play-heart:active {
+            transform: scale(0.9);
+        }
+
+        /* --- FOTOS INTERCALADAS (BORDES RASGADOS) --- */
+        .photo-divider {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Efecto Parallax / Movimiento */
+            margin: 30px 0;
+            transition: transform 0.5s ease;
+        }
+        .photo-divider:hover {
+            transform: scale(1.02);
+        }
+
+        .torn-top {
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: 100%;
+            height: 35px;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 60' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,0 L1200,0 L1200,30 C1150,5 1100,50 1050,25 C1000,0 950,45 900,20 C850,-5 800,40 750,15 C700,-10 650,35 600,10 C550,-15 500,30 450,5 C400,-20 350,25 300,0 C250,-25 200,20 150,-5 C100,-30 50,15 0,-10 Z' fill='%231f1e1c'/%3E%3C/svg%3E");
+            background-size: 100% 100%;
+            z-index: 10;
+        }
+
+        .torn-bottom {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 35px;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 60' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,60 L0,30 C50,45 100,10 150,35 C200,60 250,15 300,40 C350,65 400,20 450,45 C500,70 550,25 600,50 C650,75 700,30 750,55 C800,80 850,35 900,60 C950,85 1000,40 1050,65 C1100,90 1150,45 1200,70 L1200,60 Z' fill='%231f1e1c'/%3E%3C/svg%3E");
+            background-size: 100% 100%;
+            z-index: 10;
+        }
+
+        /* --- SECCIONES DE TEXTO --- */
+        .content-section {
+            padding: 30px 20px;
+        }
+
+        h2.section-title {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .oval-frame {
+            border: 1px solid var(--gold);
+            border-radius: 150px 150px 0 0;
+            padding: 40px 20px;
+            margin: 20px;
+            position: relative;
+        }
+
+        /* --- ITINERARIO (TIMELINE EN ZIGZAG) --- */
+        .timeline {
+            position: relative;
+            max-width: 100%;
+            margin: 30px 0;
+            padding: 0 15px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background-color: var(--gold);
+            transform: translateX(-50%);
+        }
+        .timeline-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+        .timeline-icon, .timeline-content {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .timeline-icon i {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+        }
+        .timeline-time {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 2px;
+        }
+        .timeline-title {
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+        
+        /* Zigzag */
+        .timeline-item:nth-child(odd) .timeline-icon { text-align: right; align-items: flex-end; padding-right: 15px; }
+        .timeline-item:nth-child(odd) .timeline-content { text-align: left; padding-left: 15px; }
+        
+        .timeline-item:nth-child(even) { flex-direction: row-reverse; }
+        .timeline-item:nth-child(even) .timeline-icon { text-align: left; align-items: flex-start; padding-left: 15px; }
+        .timeline-item:nth-child(even) .timeline-content { text-align: right; padding-right: 15px; }
+
+        /* Punto central dorado */
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background-color: var(--gold);
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px var(--bg-color);
+        }
+
+        /* --- BOTONES --- */
+        .btn-theme {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: #fff;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        /* --- FOTOS INTERACTIVAS COLLAGE --- */
+        .collage-photo {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .collage-photo:hover, .collage-photo:active {
+            transform: scale(1.05);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.5) !important;
+            z-index: 10;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- CHISPAS/FUEGOS ARTIFICIALES -->
+        <canvas id="sparkles-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; pointer-events: none; z-index: 9999;"></canvas>
+        
+        <!-- VIDEO EN LA CABECERA (Si existe) -->
+        {% if invitacion.video_url %}
+        <div style="width: 100%; position: relative; background-color: #1a1a1a; display: flex; justify-content: center;">
+            <video controls autoplay loop muted playsinline style="width: 100%; height: auto; max-height: 85vh; object-fit: contain;">
+                <source src="/static/{{ invitacion.video_url }}" type="video/mp4">
+            </video>
+        </div>
+        {% endif %}
+
+        <!-- SECCIÓN 1: CABECERA Y MÚSICA -->
+        <div class="content-section" style="padding-top: 0;">
+            {% if invitacion.decoracion_bordes_url %}
+            <img src="/static/{{ invitacion.decoracion_bordes_url }}" class="top-decor" alt="Decoración">
+            {% else %}
+            <img src="/static/assets/borde-rosas.png" class="top-decor" alt="Decoración" style="filter: grayscale(100%) sepia(30%) hue-rotate(60deg);">
+            {% endif %}
+            
+            <p class="subtitle" style="margin-bottom: 5px;">Mis 15 Años</p>
+            <h1 class="names">{{ invitacion.titulo }}</h1>
+
+            {% if invitacion.musica_url %}
+            <div class="inline-player">
+                <div class="inline-player-text">Presiona el <i class="fas fa-heart" style="color:var(--gold);"></i> para escuchar nuestra canción</div>
+                <div class="inline-player-controls">
+                    <i class="fas fa-random"></i>
+                    <i class="fas fa-step-backward"></i>
+                    <button class="btn-play-heart" id="play-pause-btn">
+                        <i class="fas fa-heart" id="music-icon"></i>
+                    </button>
+                    <i class="fas fa-step-forward"></i>
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <audio id="bg-audio" loop>
+                    <source src="/static/{{ invitacion.musica_url }}" type="audio/mpeg">
+                </audio>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- FOTO 1 (Si existe) -->
+        {% if invitacion.fotos and invitacion.fotos|length > 0 %}
+        <div class="photo-divider" style="background-image: url('/static/{{ invitacion.fotos[0].foto_url }}');">
+            <div class="torn-top"></div>
+            <div class="torn-bottom"></div>
+        </div>
+        {% elif invitacion.fondo_portada_url %}
+        <div class="photo-divider" style="background-image: url('/static/{{ invitacion.fondo_portada_url }}');">
+            <div class="torn-top"></div>
+            <div class="torn-bottom"></div>
+        </div>
+        {% endif %}
+
+        <!-- SECCIÓN 2: OVALO Y CUENTA REGRESIVA -->
+        <div class="content-section">
+            <div class="oval-frame">
+                <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
+                    Anhelamos compartir esta alegría con ustedes.
+                </p>
+                <div style="font-family: var(--font-serif); font-size: 1.5rem; color: var(--text-primary); border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); padding: 10px 0; margin: 20px auto; width: 60%;">
+                    Faltan...
+                </div>
+                <div style="font-family: var(--font-serif); font-size: 2.2rem; color: var(--text-primary); margin: 15px 0; font-weight: 500; display: flex; justify-content: center; gap: 8px; align-items: flex-start;" id="countdown-container">
+                    <div style="display: flex; flex-direction: column; align-items: center; min-width: 45px;">
+                        <span id="cd-days">00</span>
+                        <span style="font-size: 0.55rem; color: var(--text-secondary); text-transform: uppercase; font-family: var(--font-sans); letter-spacing: 1px; margin-top: 5px;">Días</span>
+                    </div>
+                    <span style="font-size: 1.8rem; margin-top: -2px;">:</span>
+                    <div style="display: flex; flex-direction: column; align-items: center; min-width: 45px;">
+                        <span id="cd-hours">00</span>
+                        <span style="font-size: 0.55rem; color: var(--text-secondary); text-transform: uppercase; font-family: var(--font-sans); letter-spacing: 1px; margin-top: 5px;">Horas</span>
+                    </div>
+                    <span style="font-size: 1.8rem; margin-top: -2px;">:</span>
+                    <div style="display: flex; flex-direction: column; align-items: center; min-width: 45px;">
+                        <span id="cd-minutes">00</span>
+                        <span style="font-size: 0.55rem; color: var(--text-secondary); text-transform: uppercase; font-family: var(--font-sans); letter-spacing: 1px; margin-top: 5px;">Min</span>
+                    </div>
+                    <span style="font-size: 1.8rem; margin-top: -2px;">:</span>
+                    <div style="display: flex; flex-direction: column; align-items: center; min-width: 45px;">
+                        <span id="cd-seconds">00</span>
+                        <span style="font-size: 0.55rem; color: var(--text-secondary); text-transform: uppercase; font-family: var(--font-sans); letter-spacing: 1px; margin-top: 5px;">Seg</span>
+                    </div>
+                </div>
+                <input type="hidden" id="event-date" value="{{ invitacion.fecha_evento.isoformat() if invitacion.fecha_evento else '' }}">
+            </div>
+        </div>
+
+        <!-- FOTO 2 / UBICACIONES (Si existe) -->
+        {% if invitacion.fotos and invitacion.fotos|length > 1 %}
+        <div class="photo-divider" style="background-image: url('/static/{{ invitacion.fotos[1].foto_url }}'); height: auto; min-height: 60vh; padding: 80px 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white;">
+            <div class="torn-top"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 1;"></div>
+            
+            <div style="position: relative; z-index: 2; width: 100%; max-width: 600px;">
+                <!-- Iglesia (Solo para Bodas) -->
+                {% if invitacion.tipo_evento == 'Boda' %}
+                <div style="margin-bottom: 50px;">
+                    <i class="fas fa-church" style="font-size: 3.5rem; color: var(--gold); margin-bottom: 15px;"></i>
+                    <h2 style="font-family: var(--font-serif); font-size: 2.8rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Ceremonia</h2>
+                    <p style="font-family: var(--font-sans); font-size: 1.1rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); text-transform: uppercase;">
+                        Nombre de la Iglesia<br>
+                        Dirección de la iglesia
+                    </p>
+                    <a href="#" target="_blank" class="btn-theme" style="background-color: transparent; border: 2px solid var(--gold); color: white; margin-top: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.5);">
+                        <i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i> Ver en el Mapa
+                    </a>
+                </div>
+                {% endif %}
+
+                <!-- Recepción / Fiesta -->
+                <div>
+                    <i class="fas fa-home" style="font-size: 3.5rem; color: var(--gold); margin-bottom: 15px;"></i>
+                    <h2 style="font-family: var(--font-serif); font-size: 2.8rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Recepción Social</h2>
+                    <p style="font-family: var(--font-sans); font-size: 1.1rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); text-transform: uppercase;">
+                        {{ invitacion.lugar_nombre if invitacion.lugar_nombre else 'Lugar de Recepción' }}<br>
+                        {{ invitacion.lugar_direccion if invitacion.lugar_direccion else 'Dirección de la recepción' }}
+                    </p>
+                    {% if invitacion.lugar_gmaps_url %}
+                    <a href="{{ invitacion.lugar_gmaps_url }}" target="_blank" class="btn-theme" style="background-color: transparent; border: 2px solid var(--gold); color: white; margin-top: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.5);">
+                        <i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i> Ver en el Mapa
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="torn-bottom"></div>
+        </div>
+        {% endif %}
+
+        <!-- SECCIÓN 3: PROGRAMA (ITINERARIO) -->
+        {% if invitacion.cronograma %}
+        <div class="content-section">
+            <h2 class="section-title">Programa</h2>
+            <p class="subtitle" style="font-size: 1rem;">de 15</p>
+            
+            <div class="timeline">
+                {% for item in invitacion.cronograma %}
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="fas fa-{{ item.icono or 'clock' }}"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">{{ item.titulo }}</div>
+                        <div class="timeline-time">{{ item.hora }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- FOTO 3 (Si existe) -->
+        {% if invitacion.fotos and invitacion.fotos|length > 2 %}
+        <div class="photo-divider" style="background-image: url('/static/{{ invitacion.fotos[2].foto_url }}');">
+            <div class="torn-top"></div>
+            <div class="torn-bottom"></div>
+        </div>
+        {% endif %}
+<!-- RECOMENDACIONES DE CANCIONES -->
+<div class="song-recommendations" style="background-color: #F6F0E6; border-radius: 25px; padding: 40px 20px; margin: 40px auto; text-align: center; max-width: 90%; width: 400px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+    <h3 style="font-family: 'Great Vibes', var(--font-serif); font-size: 3rem; color: #974A27; margin-bottom: 20px; font-weight: normal;">Música</h3>
+    
+    <div style="margin-bottom: 30px; position: relative; height: 100px; display: flex; justify-content: center; align-items: center;">
+        <!-- Representación de las notas musicales con íconos -->
+        <i class="fas fa-music" style="font-size: 4rem; color: #5a4b41; opacity: 0.8; transform: rotate(-10deg); margin-right: 20px;"></i>
+        <i class="fas fa-music" style="font-size: 5rem; color: #3a302a; opacity: 0.9; transform: rotate(15deg);"></i>
+        <div style="position: absolute; width: 10px; height: 10px; border: 1px solid #5a4b41; border-radius: 50%; top: 10px; left: 30%;"></div>
+        <div style="position: absolute; width: 12px; height: 12px; border: 1px solid #5a4b41; top: 70%; left: 35%; transform: rotate(45deg);"></div>
+        <div style="position: absolute; width: 8px; height: 8px; border: 1px solid #5a4b41; border-radius: 50%; top: 20%; right: 30%;"></div>
+    </div>
+
+    <p style="font-family: var(--font-sans); font-size: 1.1rem; color: #AE6E4E; margin-bottom: 15px; line-height: 1.4;">
+        ¡Ayúdanos para que nuestra<br>boda sea inolvidable!
+    </p>
+    <p style="font-family: var(--font-sans); font-size: 1rem; color: #AE6E4E; margin-bottom: 30px; padding: 0 15px;">
+        Agrega la música que deseas escuchar dando clic en el botón:
+    </p>
+
+    <a href="https://api.whatsapp.com/send?phone={{ invitacion.whatsapp_confirmacion }}&text=%C2%A1Hola!%20Mi%20canción%20recomendada%20es%20..." target="_blank" style="display: inline-block; background-color: #BE8B69; color: white; text-decoration: none; padding: 12px 35px; border-radius: 30px; font-family: var(--font-sans); font-size: 1.1rem; font-weight: 500; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        Agregar Música
+    </a>
+</div>
+
+        <!-- SECCIÓN 4: VESTIMENTA Y RECEPCIÓN -->
+        <div class="content-section">
+            <i class="fas fa-tshirt" style="font-size: 2rem; color: var(--gold); margin-bottom: 10px;"></i>
+            <h2 class="section-title" style="margin-bottom: 5px;">Código de Vestimenta</h2>
+            <p style="font-size: 1.1rem; color: var(--text-primary); font-family: var(--font-serif);">{{ invitacion.codigo_vestimenta }}</p>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px;">{{ invitacion.codigo_vestimenta_detalles }}</p>
+            
+            <!-- Paleta de colores mock (puedes ajustar) -->
+            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 40px;">
+                <div style="width: 25px; height: 25px; border-radius: 50%; background-color: #c9d8c5;"></div>
+                <div style="width: 25px; height: 25px; border-radius: 50%; background-color: #f1efdb;"></div>
+                <div style="width: 25px; height: 25px; border-radius: 50%; background-color: #e8c39e;"></div>
+                <div style="width: 25px; height: 25px; border-radius: 50%; background-color: #d19f71;"></div>
+            </div>
+
+        </div>
+
+        <!-- FOTO 4 (Si existe) -->
+        {% if invitacion.fotos and invitacion.fotos|length > 3 %}
+        <div class="photo-divider" style="background-image: url('/static/{{ invitacion.fotos[3].foto_url }}');">
+            <div class="torn-top"></div>
+            <div class="torn-bottom"></div>
+        </div>
+        {% endif %}
+
+        <!-- SECCIÓN 5: REGALOS Y VIDEO -->
+        <div class="content-section">
+            {% if invitacion.regalos_banco or invitacion.regalos_nequi or invitacion.regalos_daviplata %}
+            <h2 class="section-title">Sugerencia de Regalo</h2>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 20px;">Tu presencia es nuestro mayor regalo, pero si deseas tener un detalle:</p>
+            
+            {% if invitacion.regalos_banco %}
+            <div style="margin-bottom: 10px;">
+                <p style="margin:0; font-size:0.9rem; color:var(--text-primary);"><strong>{{ invitacion.regalos_banco }}</strong>: {{ invitacion.regalos_cuenta }}</p>
+            </div>
+            {% endif %}
+            {% if invitacion.regalos_nequi %}
+            <div style="margin-bottom: 10px;">
+                <p style="margin:0; font-size:0.9rem; color:var(--text-primary);"><strong>Nequi</strong>: {{ invitacion.regalos_nequi }}</p>
+            </div>
+            {% endif %}
+            {% if invitacion.regalos_daviplata %}
+            <div style="margin-bottom: 10px;">
+                <p style="margin:0; font-size:0.9rem; color:var(--text-primary);"><strong>Daviplata</strong>: {{ invitacion.regalos_daviplata }}</p>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+
+        <!-- SECCIÓN: NUESTRO AMOR (COLLAGE) -->
+        <div style="background-color: #6C7A64; padding: 60px 20px 50px 20px; color: white; position: relative; overflow: hidden;">
+            <!-- Decoración floral superior -->
+            {% if invitacion.decoracion_bordes_url %}
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 120px; background-image: url('/static/{{ invitacion.decoracion_bordes_url }}'); background-size: contain; background-repeat: repeat-x; background-position: top center; opacity: 0.7; pointer-events: none;"></div>
+            {% else %}
+            <div style="position: absolute; top: -10px; left: 0; width: 100%; height: 150px; background-image: url('/static/assets/borde-rosas.png'); background-size: contain; background-repeat: repeat-x; background-position: top center; opacity: 0.5; filter: grayscale(100%) brightness(200%); pointer-events: none;"></div>
+            {% endif %}
+
+            <h2 style="font-family: 'Great Vibes', var(--font-serif); font-size: 3.5rem; text-align: center; margin-bottom: 15px; font-weight: normal; color: white; position: relative; z-index: 2;">
+                {% if invitacion.tipo_evento == 'Boda' %}
+                    Nuestro Amor
+                {% elif invitacion.tipo_evento == 'Quinceañero' %}
+                    Mis Quince.!!
+                {% else %}
+                    Mis Recuerdos
+                {% endif %}
+            </h2>
+            
+            <div style="text-align: center; margin-bottom: 40px;">
+                <!-- Icono de cámara simulando el boceto -->
+                <i class="fas fa-camera-retro" style="font-size: 4rem; color: white; opacity: 0.9;"></i>
+            </div>
+
+            <!-- Collage de fotos (usa las fotos adicionales subidas) -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 800px; margin: 0 auto;">
+                {% if invitacion.fotos and invitacion.fotos|length > 2 %}
+                    <!-- Si hay más fotos, se hace el collage dinámico -->
+                    <div class="collage-photo" onclick="openModal('/static/{{ invitacion.fotos[2].foto_url }}')" style="grid-column: span 2; height: 300px; background-image: url('/static/{{ invitacion.fotos[2].foto_url }}'); background-size: cover; background-position: center; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"></div>
+                    
+                    {% if invitacion.fotos|length > 3 %}
+                    <div class="collage-photo" onclick="openModal('/static/{{ invitacion.fotos[3].foto_url }}')" style="height: 220px; background-image: url('/static/{{ invitacion.fotos[3].foto_url }}'); background-size: cover; background-position: center; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"></div>
+                    {% endif %}
+                    
+                    {% if invitacion.fotos|length > 4 %}
+                    <div class="collage-photo" onclick="openModal('/static/{{ invitacion.fotos[4].foto_url }}')" style="height: 220px; background-image: url('/static/{{ invitacion.fotos[4].foto_url }}'); background-size: cover; background-position: center; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"></div>
+                    {% endif %}
+                {% else %}
+                    <!-- Placeholders si no hay suficientes fotos subidas aún -->
+                    <div style="grid-column: span 2; height: 300px; background-color: rgba(255,255,255,0.2); border-radius: 4px; display:flex; align-items:center; justify-content:center;"><span style="opacity:0.6;">(Foto Principal Collage)</span></div>
+                    <div style="height: 220px; background-color: rgba(255,255,255,0.2); border-radius: 4px; display:flex; align-items:center; justify-content:center;"><span style="opacity:0.6;">(Foto 2)</span></div>
+                    <div style="height: 220px; background-color: rgba(255,255,255,0.2); border-radius: 4px; display:flex; align-items:center; justify-content:center;"><span style="opacity:0.6;">(Foto 3)</span></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- SECCIÓN: COMPARTE LAS FOTOS DE LA BODA (FONDO FULL) -->
+        <div style="position: relative; background-image: url('{% if invitacion.fotos and invitacion.fotos|length > 0 %}/static/{{ invitacion.fotos[-1].foto_url }}{% else %}https://via.placeholder.com/800x600{% endif %}'); background-size: cover; background-position: center; background-attachment: fixed; padding: 100px 20px; text-align: center; color: white;">
+            <!-- Overlay oscuro para legibilidad -->
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.4);"></div>
+            
+            <div style="position: relative; z-index: 1;">
+                <h2 style="font-family: var(--font-serif); font-size: 3rem; line-height: 1.1; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); font-weight: bold;">
+                    Comparte las fotos<br>de la Boda
+                </h2>
+                
+                <div style="margin-bottom: 30px;">
+                    <i class="fas fa-camera" style="font-size: 5rem; color: white; opacity: 0.9; text-shadow: 0 0 10px rgba(0,0,0,0.5);"></i>
+                </div>
+                
+                <!-- Hashtag dinámico -->
+                <p style="font-family: var(--font-serif); font-size: 2.2rem; font-weight: bold; margin-bottom: 40px; text-shadow: 2px 2px 5px rgba(0,0,0,0.6);">
+                    #{{ invitacion.titulo|replace(" ", "") if invitacion.titulo else "Boda" }}
+                </p>
+                
+                <a href="https://instagram.com/explore/tags/{{ invitacion.titulo|replace(' ', '') if invitacion.titulo else 'Boda' }}" target="_blank" style="display: inline-block; background-color: #BE8B69; color: white; text-decoration: none; padding: 15px 40px; border-radius: 30px; font-family: var(--font-sans); font-size: 1.1rem; font-weight: 500; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s ease;">
+                    Hashtag Instagram
+                </a>
+            </div>
+        </div>
+
+            {% if not invitacion.video_url %}
+            <!-- Aquí estaba el video, pero lo movimos arriba -->
+            {% endif %}
+
+            <!-- BOTONES FINALES: CONFIRMAR Y DESCARGAR -->
+            <div style="margin-top: 50px; text-align: center; padding: 0 20px 40px 20px;">
+                {% if invitacion.whatsapp_confirmacion %}
+                <a href="https://api.whatsapp.com/send?phone={{ invitacion.whatsapp_confirmacion }}&text=Hola,%20deseo%20confirmar%20mi%20asistencia." target="_blank" style="display: inline-block; background-color: #00E676; color: white; text-decoration: none; padding: 15px 30px; border-radius: 50px; font-family: var(--font-sans); font-size: 1rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; width: 100%; max-width: 400px; box-sizing: border-box; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s ease;">
+                    <i class="fab fa-whatsapp" style="margin-right: 8px; font-size: 1.2rem;"></i> Confirmar Asistencia
+                </a>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div> <!-- main-container -->
+
+    <!-- LIGHTBOX MODAL PARA FOTOS -->
+    <div id="photo-modal" onclick="closeModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center; cursor: pointer;">
+        <span style="position: absolute; top: 20px; right: 30px; color: white; font-size: 2.5rem; font-weight: bold;">&times;</span>
+        <img id="modal-img" src="" style="max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); object-fit: contain;">
+    </div>
+
+    <script>
+        function openModal(imgUrl) {
+            document.getElementById('modal-img').src = imgUrl;
+            document.getElementById('photo-modal').style.display = 'flex';
+        }
+        function closeModal() {
+            document.getElementById('photo-modal').style.display = 'none';
+        }
+
+        // Lógica del reproductor de música
+        const audio = document.getElementById('bg-audio');
+        const playBtn = document.getElementById('play-pause-btn');
+        const icon = document.getElementById('music-icon');
+        let isPlaying = false;
+        
+        function startAudio() {
+            if(audio && audio.paused) {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    if(icon) icon.style.animation = "pulse 1s infinite alternate";
+                }).catch(e => console.log("Autoplay bloqueado por el navegador", e));
+            }
+        }
+
+        if(playBtn && audio) {
+            playBtn.addEventListener('click', () => {
+                if(audio.paused) {
+                    startAudio();
+                } else {
+                    audio.pause();
+                    isPlaying = false;
+                    icon.style.animation = "none";
+                }
+            });
+            
+            // Intentar autoplay automático si viene desde la portada o si ya se interactuó
+            if (new URLSearchParams(window.location.search).get('autoplay') === '1' || localStorage.getItem('music_playing') === 'true') {
+                startAudio();
+                // Algunos navegadores móviles requieren un retraso o un micro-tap
+                setTimeout(startAudio, 1000);
+            }
+            
+            // Fallback por si el navegador bloquea el primer intento
+            document.body.addEventListener('click', () => {
+                if (!isPlaying) startAudio();
+            }, { once: true });
+        }
+
+        // Lógica del Contador
+        const eventDateStr = document.getElementById('event-date').value;
+        const elDays = document.getElementById('cd-days');
+        const elHours = document.getElementById('cd-hours');
+        const elMins = document.getElementById('cd-minutes');
+        const elSecs = document.getElementById('cd-seconds');
+
+        if(eventDateStr) {
+            const eventDate = new Date(eventDateStr).getTime();
+            
+            const timerInterval = setInterval(function() {
+                const now = new Date().getTime();
+                const distance = eventDate - now;
+                
+                if (distance < 0) {
+                    clearInterval(timerInterval);
+                    elDays.innerText = "00";
+                    elHours.innerText = "00";
+                    elMins.innerText = "00";
+                    elSecs.innerText = "00";
+                    return;
+                }
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                elDays.innerText = days.toString().padStart(2, '0');
+                elHours.innerText = hours.toString().padStart(2, '0');
+                elMins.innerText = minutes.toString().padStart(2, '0');
+                elSecs.innerText = seconds.toString().padStart(2, '0');
+            }, 1000);
+        }
+
+        // Efecto de Fuegos Pirotécnicos en el Canvas
+        const canvas = document.getElementById('sparkles-canvas');
+        if(canvas) {
+            const ctx = canvas.getContext('2d');
+            let W = window.innerWidth;
+            let H = window.innerHeight;
+            canvas.width = W;
+            canvas.height = H;
+            
+            let particles = [];
+            let fireworks = [];
+            
+            function createFirework() {
+                let x = Math.random() * W;
+                let y = H;
+                let targetY = H * 0.1 + Math.random() * (H * 0.4); // Explota en la mitad superior
+                fireworks.push({
+                    x: x, y: y, targetY: targetY,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: -(Math.random() * 4 + 6), // Sube rápido
+                    color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+                    exploded: false
+                });
+            }
+
+            function explode(fw) {
+                // Crear chispas de la explosión
+                for(let i=0; i<50; i++) {
+                    particles.push({
+                        x: fw.x, y: fw.y,
+                        vx: (Math.random() - 0.5) * 10,
+                        vy: (Math.random() - 0.5) * 10,
+                        alpha: 1,
+                        color: fw.color,
+                        life: Math.random() * 0.02 + 0.01
+                    });
+                }
+            }
+            
+            function animateCanvas() {
+                ctx.clearRect(0, 0, W, H); // Limpiar el frame, NO usar fillRect porque oscurece toda la página
+                
+                if(Math.random() < 0.04) createFirework(); 
+                
+                // Actualizar cohetes
+                for (let i = fireworks.length - 1; i >= 0; i--) {
+                    let fw = fireworks[i];
+                    if(!fw.exploded) {
+                        fw.x += fw.vx;
+                        fw.y += fw.vy;
+                        
+                        ctx.fillStyle = '#fff'; // El cohete que sube es blanco
+                        ctx.beginPath();
+                        ctx.arc(fw.x, fw.y, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Si alcanzó su punto máximo, explota
+                        if(fw.y <= fw.targetY || fw.vy >= 0) {
+                            fw.exploded = true;
+                            explode(fw);
+                            fireworks.splice(i, 1);
+                        }
+                    }
+                }
+                
+                // Actualizar partículas de la explosión
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    let p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.1; // Gravedad ligera
+                    p.alpha -= p.life; // Se desvanecen
+                    
+                    if (p.alpha <= 0) {
+                        particles.splice(i, 1);
+                        continue;
+                    }
+                    
+                    ctx.globalAlpha = p.alpha;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+                requestAnimationFrame(animateCanvas);
+            }
+            animateCanvas();
+            
+            window.addEventListener('resize', () => {
+                W = window.innerWidth;
+                H = window.innerHeight;
+                canvas.width = W;
+                canvas.height = H;
+            });
+        }
+
+        // Efecto Burbujas de Corazones (Izquierda a Derecha y Viceversa)
+        const heartsContainer = document.createElement('div');
+        heartsContainer.style.position = 'fixed';
+        heartsContainer.style.top = '0';
+        heartsContainer.style.left = '0';
+        heartsContainer.style.width = '100%';
+        heartsContainer.style.height = '100vh';
+        heartsContainer.style.pointerEvents = 'none';
+        heartsContainer.style.zIndex = '9998';
+        heartsContainer.style.overflow = 'hidden';
+        document.body.appendChild(heartsContainer);
+
+        function createHeartBubble() {
+            const heart = document.createElement('i');
+            heart.className = 'fas fa-heart';
+            
+            // Randomly start left or right
+            const startLeft = Math.random() > 0.5;
+            const startY = Math.random() * window.innerHeight;
+            
+            heart.style.position = 'absolute';
+            heart.style.top = `${startY}px`;
+            // Color romántico
+            heart.style.color = Math.random() > 0.5 ? 'rgba(255, 77, 77, 0.7)' : 'rgba(255, 179, 179, 0.7)';
+            heart.style.fontSize = `${Math.random() * 20 + 15}px`;
+            heart.style.transition = 'all 9s linear';
+            
+            if(startLeft) {
+                heart.style.left = '-50px';
+                heart.style.transform = `rotate(${Math.random() * 45}deg)`;
+            } else {
+                heart.style.left = `${window.innerWidth + 50}px`;
+                heart.style.transform = `rotate(-${Math.random() * 45}deg)`;
+            }
+            
+            heartsContainer.appendChild(heart);
+            
+            // Force reflow
+            void heart.offsetWidth;
+            
+            // Animate moving to the other side and slightly up/down
+            const endY = startY + (Math.random() * 300 - 150); 
+            if(startLeft) {
+                heart.style.left = `${window.innerWidth + 50}px`;
+            } else {
+                heart.style.left = '-50px';
+            }
+            heart.style.top = `${endY}px`;
+            
+            // Remove after animation
+            setTimeout(() => {
+                if(heart.parentNode) heart.parentNode.removeChild(heart);
+            }, 9000);
+        }
+
+        // Crear un corazón nuevo cada 800ms
+        setInterval(createHeartBubble, 800);
+
+    </script>
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15); color: #ff6b6b; }
+        }
+    </style>
+</body>
+</html>

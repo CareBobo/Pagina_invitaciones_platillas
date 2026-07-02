@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ invitacion.titulo }} - Detalles del Evento</title>
+    
+    <!-- PWA Support -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#C47A6C">
+    <link rel="apple-touch-icon" href="/static/assets/icon-192.png">
+
+    <!-- CSS de Plantillas y Estilos Generales -->
+    <link rel="stylesheet" href="/static/css/templates.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <!-- FontAwesome Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="theme-body theme-{{ invitacion.plantilla }} invitation-body">
+
+    <!-- Elementos Decorativos Premium de Bordes (Rosas y Anillos) -->
+    <div class="decor-corner-top-left" {% if invitacion.decoracion_bordes_url %}style="background-image: url('/static/{{ invitacion.decoracion_bordes_url }}');"{% endif %}></div>
+    <div class="decor-corner-top-right" {% if invitacion.decoracion_bordes_url %}style="background-image: url('/static/{{ invitacion.decoracion_bordes_url }}');"{% endif %}></div>
+    <div class="decor-rings-bottom-left"></div>
+    <div class="decor-rings-bottom-right"></div>
+
+    <!-- Elemento Decorativo Especial Animado al Scroll (Pampas/Flores grandes) -->
+    <div class="scroll-decor-bottom-left" id="scroll-decor" {% if invitacion.decoracion_bordes_url %}style="background-image: url('/static/{{ invitacion.decoracion_bordes_url }}');"{% endif %}></div>
+
+    <!-- Canvas de Fuegos Artificiales y Chispas Interactivas -->
+    <canvas id="sparkles-canvas"></canvas>
+
+    <!-- Reproductor de Música Flotante -->
+    {% if invitacion.musica_url %}
+    <div class="music-player-container" id="music-player">
+        <div class="music-bars" id="music-bars">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="music-info">Música de fondo</div>
+        <button class="music-btn" id="play-pause-btn">
+            <i class="fas fa-play" id="music-icon"></i>
+        </button>
+        <audio id="bg-audio" loop>
+            <source src="/static/{{ invitacion.musica_url }}" type="audio/mpeg">
+        </audio>
+    </div>
+    {% endif %}
+
+    <!-- Botón Flotante de WhatsApp para Contacto Directo -->
+    {% if invitacion.whatsapp_confirmacion %}
+    <a href="https://api.whatsapp.com/send?phone={{ invitacion.whatsapp_confirmacion }}&text=Hola,%20deseo%20hacer%20una%20consulta%20sobre%20el%20evento." target="_blank" class="btn-whatsapp-float" title="Contactar Organizador">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    {% endif %}
+
+    <!-- SECCIÓN 1: Video de Presentación (Cabecera) -->
+    <header class="video-section">
+        <div class="video-container">
+            {% if invitacion.video_url %}
+            <!-- Video difuminado en segundo plano para rellenar espacios -->
+            <video class="video-bg-blur" autoplay loop muted playsinline>
+                <source src="/static/{{ invitacion.video_url }}" type="video/mp4">
+            </video>
+            <!-- Video principal centrado y completo -->
+            <video class="video-element" autoplay loop muted playsinline>
+                <source src="/static/{{ invitacion.video_url }}" type="video/mp4">
+                Tu navegador no soporta reproducción de videos.
+            </video>
+            {% else %}
+            <!-- Imagen decorativa por defecto si no hay video -->
+            <div style="width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/static/assets/header-default.png') center/cover;"></div>
+            {% endif %}
+            <div class="video-overlay">
+                <p class="heading-theme">Nuestra Invitación Especial</p>
+                <h1 class="script-theme">{{ invitacion.titulo }}</h1>
+                <p class="text-theme">{{ invitacion.fecha_evento.strftime('%d de %B, %Y') }}</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- SECCIÓN 2: Historia -->
+    {% if invitacion.historia %}
+    <section class="invitation-section reveal" id="historia">
+        <h2 class="section-title heading-theme">Nuestra Historia</h2>
+        <div class="section-divider"></div>
+        <div class="floral-header"></div>
+        <p class="history-text text-theme">{{ invitacion.historia }}</p>
+    </section>
+    {% endif %}
+
+    <!-- SECCIÓN 3: Nombres Principales & Decoraciones -->
+    <section class="invitation-section names-section reveal" id="nombres">
+        <!-- Siluetas en las 4 Esquinas -->
+        <div class="names-corner names-corner-tl"></div>
+        <div class="names-corner names-corner-tr"></div>
+        <div class="names-corner names-corner-bl"></div>
+        <div class="names-corner names-corner-br"></div>
+        
+        <p class="welcome-guest-meta heading-theme" style="margin-bottom: 10px;">Celebremos Juntos</p>
+        
+        <!-- Nombre encerrado en un corazón -->
+        <div class="names-heart-container" style="position: relative; width: 100%; max-width: 400px; margin: 0 auto; height: 350px; display: flex; align-items: center; justify-content: center;">
+            <img src="{% if invitacion.decoracion_centro_url %}/static/{{ invitacion.decoracion_centro_url }}{% else %}/static/assets/heart-frame.png{% endif %}" alt="Corazón Decorativo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; opacity: 0.95;">
+            <h1 class="names-title script-theme" style="position: relative; z-index: 2; margin-top: -30px; font-size: 3.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">{{ invitacion.titulo }}</h1>
+        </div>
+        
+        <p class="welcome-guest-meta text-theme" style="margin-top: -10px;">¡Te esperamos para compartir este día especial!</p>
+    </section>
+
+    <!-- SECCIÓN: FOTO CON DIFUMINADO SUAVE (bordes con gradiente) -->
+    <div class="photo-divider" style="background-image: url('{% if invitacion.fotos and invitacion.fotos|length > 0 %}/static/{{ invitacion.fotos[0].foto_url }}{% else %}/static/assets/header-default.png{% endif %}');"></div>
+
+    <!-- SECCIÓN 4: Cuenta Regresiva -->
+    <section class="invitation-section reveal" id="cuenta-regresiva">
+        <h2 class="section-title heading-theme">Falta Muy Poco</h2>
+        <div class="section-divider"></div>
+        
+        <!-- Logos de guirnaldas originales -->
+        <div class="countdown-garland countdown-garland-top"></div>
+        
+        <div class="countdown-container" style="display: flex; gap: 15px; justify-content: center;">
+            <!-- Números encerrados en círculos -->
+            <div class="countdown-box" style="background: transparent; border: 2px solid var(--accent-color); border-radius: 50%; width: 80px; height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                <span class="countdown-number heading-theme" id="days" style="color: var(--accent-color); font-size: 1.6rem; line-height: 1;">00</span>
+                <span class="countdown-label text-theme" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Días</span>
+            </div>
+            <div class="countdown-box" style="background: transparent; border: 2px solid var(--accent-color); border-radius: 50%; width: 80px; height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                <span class="countdown-number heading-theme" id="hours" style="color: var(--accent-color); font-size: 1.6rem; line-height: 1;">00</span>
+                <span class="countdown-label text-theme" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Horas</span>
+            </div>
+            <div class="countdown-box" style="background: transparent; border: 2px solid var(--accent-color); border-radius: 50%; width: 80px; height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                <span class="countdown-number heading-theme" id="minutes" style="color: var(--accent-color); font-size: 1.6rem; line-height: 1;">00</span>
+                <span class="countdown-label text-theme" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Minutos</span>
+            </div>
+            <div class="countdown-box" style="background: transparent; border: 2px solid var(--accent-color); border-radius: 50%; width: 80px; height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                <span class="countdown-number heading-theme" id="seconds" style="color: var(--accent-color); font-size: 1.6rem; line-height: 1;">00</span>
+                <span class="countdown-label text-theme" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Segundos</span>
+            </div>
+        </div>
+        
+        <div class="countdown-garland countdown-garland-bottom"></div>
+    </section>
+
+    <!-- SECCIÓN 5: Cronograma del Evento -->
+    {% if invitacion.cronograma %}
+    <section class="invitation-section reveal" id="cronograma">
+        <h2 class="section-title heading-theme">Cronograma del Evento</h2>
+        <div class="section-divider"></div>
+        <div class="timeline">
+            {% for item in invitacion.cronograma %}
+            <div class="timeline-item {% if loop.index % 2 == 0 %}timeline-right{% else %}timeline-left{% endif %} reveal">
+                <div class="timeline-content card-theme">
+                    <div class="timeline-time heading-theme">
+                        <i class="fas fa-{{ item.icono or 'clock' }}" style="margin-right: 6px;"></i>{{ item.hora }}
+                    </div>
+                    <h3 class="timeline-item-title heading-theme">{{ item.titulo }}</h3>
+                    {% if item.descripcion %}
+                    <p class="timeline-desc text-theme">{{ item.descripcion }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- SECCIÓN 6: Detalles de Fecha y Ubicación -->
+    <section class="invitation-section reveal" id="detalles">
+        <h2 class="section-title heading-theme">¿Cuándo & Dónde?</h2>
+        <div class="section-divider"></div>
+        <div class="details-grid">
+            <div class="detail-card card-theme">
+                <i class="far fa-calendar-alt"></i>
+                <h3 class="heading-theme">Fecha & Hora</h3>
+                <p class="text-theme">{{ invitacion.fecha_evento.strftime('%d de %B, %Y') }}</p>
+                <p class="text-theme">{{ invitacion.fecha_evento.strftime('%I:%M %p') }}</p>
+            </div>
+            <div class="detail-card card-theme">
+                <i class="fas fa-map-marker-alt"></i>
+                <h3 class="heading-theme">Lugar & Dirección</h3>
+                <p class="text-theme" style="font-weight: 500;">{{ invitacion.lugar_nombre or 'Salón de Eventos' }}</p>
+                <p class="text-theme">{{ invitacion.lugar_direccion or 'Dirección no especificada' }}</p>
+            </div>
+        </div>
+
+        {% if invitacion.lugar_gmaps_url %}
+            {% if 'maps/embed' in invitacion.lugar_gmaps_url or 'maps/d/embed' in invitacion.lugar_gmaps_url or 'google.com/maps/embed' in invitacion.lugar_gmaps_url %}
+            <div class="map-wrapper card-theme">
+                <iframe 
+                    src="{{ invitacion.lugar_gmaps_url }}" 
+                    width="100%" 
+                    height="100%" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+            {% else %}
+            <!-- Tarjeta decorativa premium alternativa si el enlace no es incrustable -->
+            <div class="map-wrapper card-theme" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.05); padding: 40px; text-align: center; border: 1px dashed var(--border-color);">
+                <i class="fas fa-map-marked-alt" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 15px;"></i>
+                <h4 class="heading-theme" style="margin-bottom: 8px; font-size: 1.2rem;">Ubicación del Evento</h4>
+                <p class="text-theme" style="font-size: 0.85rem; color: var(--text-muted); max-width: 420px; margin-bottom: 20px; line-height: 1.5;">
+                    La ubicación interactiva está lista. Haz clic en el botón de abajo para abrir el mapa directamente en tu aplicación de Google Maps.
+                </p>
+            </div>
+            {% endif %}
+            <a href="{{ invitacion.lugar_gmaps_url }}" target="_blank" class="btn-theme heading-theme" style="margin-top: 30px; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-route"></i> Cómo llegar (Google Maps)
+            </a>
+        {% endif %}
+    </section>
+
+    <!-- SECCIÓN 7: Galería Masonry -->
+    {% if invitacion.fotos %}
+    <section class="invitation-section reveal" id="galeria">
+        <h2 class="section-title heading-theme">Nuestra Galería</h2>
+        <div class="section-divider"></div>
+        <div class="gallery-grid">
+            {% for foto in invitacion.fotos %}
+            <div class="gallery-item card-theme" onclick="openLightbox('/static/{{ foto.foto_url }}')">
+                <img src="/static/{{ foto.foto_url }}" alt="Galería Foto">
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Lightbox Modal para visualizar la galería -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img" src="" alt="">
+    </div>
+
+    <!-- SECCIÓN 8: Código de Vestimenta -->
+    {% if invitacion.codigo_vestimenta %}
+    <section class="invitation-section reveal" id="codigo-vestimenta">
+        <h2 class="section-title heading-theme">Código de Vestimenta</h2>
+        <div class="section-divider"></div>
+        <div class="dress-card card-theme">
+            <i class="fas fa-user-tie"></i>
+            <h3 class="heading-theme" style="font-size: 1.5rem; margin-bottom: 10px;">{{ invitacion.codigo_vestimenta }}</h3>
+            {% if invitacion.codigo_vestimenta_detalles %}
+            <p class="text-theme" style="color: var(--text-muted);">{{ invitacion.codigo_vestimenta_detalles }}</p>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- SECCIÓN 9: Regalos / Contribución -->
+    <section class="invitation-section reveal" id="regalos">
+        <h2 class="section-title heading-theme">Lluvia de Sobres / Regalos</h2>
+        <div class="section-divider"></div>
+        <p class="text-theme" style="max-width: 600px; margin-bottom: 40px; color: var(--text-muted);">
+            Tu presencia es nuestro mayor regalo. Sin embargo, si deseas hacernos un detalle, te dejamos las siguientes opciones de transferencia o mesa de regalos:
+        </p>
+        <div class="gifts-grid">
+            {% if invitacion.regalos_banco and invitacion.regalos_cuenta %}
+            <div class="gift-card card-theme">
+                <i class="fas fa-university"></i>
+                <h3 class="heading-theme">{{ invitacion.regalos_banco }}</h3>
+                <p class="text-theme">Nº Cuenta: {{ invitacion.regalos_cuenta }}</p>
+                <p class="text-theme" style="font-size: 0.8rem; color: var(--text-muted);">Transferencia Bancaria</p>
+            </div>
+            {% endif %}
+            
+            {% if invitacion.regalos_nequi %}
+            <div class="gift-card card-theme">
+                <i class="fas fa-mobile-alt"></i>
+                <h3 class="heading-theme">Nequi</h3>
+                <p class="text-theme">Celular: {{ invitacion.regalos_nequi }}</p>
+            </div>
+            {% endif %}
+            
+            {% if invitacion.regalos_daviplata %}
+            <div class="gift-card card-theme">
+                <i class="fas fa-wallet"></i>
+                <h3 class="heading-theme">Daviplata</h3>
+                <p class="text-theme">Celular: {{ invitacion.regalos_daviplata }}</p>
+            </div>
+            {% endif %}
+
+            {% if invitacion.regalos_lista_url %}
+            <div class="gift-card card-theme">
+                <i class="fas fa-gift"></i>
+                <h3 class="heading-theme">Lista de Regalos</h3>
+                <a href="{{ invitacion.regalos_lista_url }}" target="_blank" class="btn-theme heading-theme" style="margin-top: 15px; padding: 8px 20px; font-size: 0.75rem;">
+                    Ver Lista
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- SECCIÓN: Sugerencias de Música -->
+    <section class="invitation-section reveal" id="musica-sugerida-section">
+        <h2 class="section-title heading-theme">Música</h2>
+        <div class="section-divider"></div>
+        <div class="dress-card card-theme" style="padding: 40px; text-align: center; max-width: 600px; margin: 0 auto;">
+            <i class="fas fa-music" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 20px;"></i>
+            <h3 class="heading-theme" style="font-size: 1.5rem; margin-bottom: 15px;">¡Ayúdanos a que nuestra boda sea inolvidable!</h3>
+            <p class="text-theme" style="color: var(--text-muted); margin-bottom: 25px;">
+                Agrega la música que deseas escuchar dando clic en el botón.
+            </p>
+            <button class="btn-theme heading-theme" onclick="openMusicModal()">
+                <i class="fas fa-compact-disc" style="margin-right: 6px;"></i> Lista de música
+            </button>
+        </div>
+    </section>
+
+    <!-- Modal para sugerir música -->
+    <div id="music-modal" class="lightbox" style="display: none; align-items: center; justify-content: center; z-index: 1100;">
+        <div class="card-theme" style="max-width: 450px; width: 90%; padding: 30px; position: relative; text-align: left; box-shadow: 0 15px 45px rgba(0,0,0,0.4); border: 1px solid var(--border-color); background: var(--card-bg);">
+            <span class="lightbox-close" onclick="closeMusicModal()" style="font-size: 2rem; top: 10px; right: 15px; cursor: pointer; color: var(--text-muted); position: absolute;">&times;</span>
+            <h3 class="heading-theme" style="margin-top: 0; margin-bottom: 10px; font-size: 1.4rem; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-music" style="color: var(--accent-color);"></i> Sugerir Canción
+            </h3>
+            <p class="text-theme" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Recomienda las canciones que no pueden faltar en la pista de baile.</p>
+            
+            <form id="music-form">
+                <input type="hidden" id="music-uuid" value="{{ invitado.uuid }}">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="music-song" class="heading-theme" style="display: block; margin-bottom: 5px; font-size: 0.85rem;">Nombre de la Canción</label>
+                    <input type="text" id="music-song" required placeholder="Ej: Danza Kuduro" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); font-family: inherit; font-size: 0.9rem; background: rgba(255,255,255,0.05); color: var(--text-color);">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="music-artist" class="heading-theme" style="display: block; margin-bottom: 5px; font-size: 0.85rem;">Artista / Banda</label>
+                    <input type="text" id="music-artist" required placeholder="Ej: Don Omar" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); font-family: inherit; font-size: 0.9rem; background: rgba(255,255,255,0.05); color: var(--text-color);">
+                </div>
+                <button type="submit" class="btn-theme heading-theme" style="width: 100%; justify-content: center;" id="music-submit-btn">
+                    Enviar Sugerencia
+                </button>
+            </form>
+            <div id="music-modal-alert" style="margin-top: 15px; display: none; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; font-weight: 500;"></div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN: COMPARTE LAS FOTOS EN INSTAGRAM -->
+    {% if invitacion.instagram_url %}
+    <section class="instagram-section reveal" id="instagram-share" style="position: relative; background-image: url('{% if invitacion.fotos and invitacion.fotos|length > 0 %}/static/{{ invitacion.fotos[-1].foto_url }}{% else %}/static/assets/header-default.png{% endif %}'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 75vh; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; padding: 100px 20px; text-align: center; width: 100%;">
+        <!-- Overlay oscuro para legibilidad -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.45); z-index: 1;"></div>
+        
+        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+            <h2 class="heading-theme" style="font-family: var(--font-heading); font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.2; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">
+                Comparte las fotos<br>de la Boda
+            </h2>
+            
+            <!-- Icono de cámara vectorizado o estilo boceto -->
+            <div style="margin: 10px 0;">
+                <svg width="120" height="90" viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.95; filter: drop-shadow(0px 2px 10px rgba(0,0,0,0.3));">
+                    <rect x="2" y="18" width="116" height="70" rx="10" stroke="white" stroke-width="3" stroke-dasharray="1 1"/>
+                    <path d="M40 18L44.5 8H75.5L80 18" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="60" cy="53" r="22" stroke="white" stroke-width="3"/>
+                    <circle cx="60" cy="53" r="14" stroke="white" stroke-width="2" stroke-dasharray="2 2"/>
+                    <circle cx="98" cy="34" r="5" fill="white"/>
+                    <rect x="18" y="30" width="12" height="8" rx="2" stroke="white" stroke-width="2"/>
+                </svg>
+            </div>
+            
+            <!-- Hashtag dinámico -->
+            <p class="script-theme" style="font-size: clamp(2rem, 5vw, 3rem); font-weight: bold; text-shadow: 2px 2px 8px rgba(0,0,0,0.7); margin-bottom: 20px; color: #fff;">
+                #{{ invitacion.titulo|replace(" ", "")|replace("&", "")|replace("y", "")|replace("-", "") if invitacion.titulo else "Boda" }}
+            </p>
+            
+            <a href="{{ invitacion.instagram_url }}" target="_blank" class="btn-theme heading-theme" style="background-color: var(--accent-color); border: 2px solid var(--accent-color); color: #fff; padding: 15px 40px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 1rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fab fa-instagram" style="font-size: 1.2rem;"></i> Hashtag Instagram
+            </a>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- SECCIÓN 10: Confirmación de Asistencia (RSVP) -->
+    <section class="invitation-section reveal" id="rsvp">
+        <h2 class="section-title heading-theme">Confirmar Asistencia</h2>
+        <div class="section-divider"></div>
+        <div class="rsvp-wrapper card-theme">
+            <form id="rsvp-form" class="rsvp-form">
+                <!-- UUID Oculto -->
+                <input type="hidden" name="uuid" value="{{ invitado.uuid }}">
+                
+                <div class="form-group">
+                    <label for="rsvp-name" class="heading-theme">Nombre del Invitado</label>
+                    <input type="text" id="rsvp-name" name="nombre" value="{{ invitado.nombre }}" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="rsvp-phone" class="heading-theme">Celular / Teléfono</label>
+                    <input type="tel" id="rsvp-phone" name="telefono" value="{{ invitado.telefono or '' }}" placeholder="Ej: 3001234567" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="rsvp-status" class="heading-theme">¿Confirmas tu asistencia?</label>
+                    <select id="rsvp-status" name="estado_rsvp" required>
+                        <option value="Confirmado" {% if invitado.estado_rsvp == 'Confirmado' %}selected{% endif %}>Sí, asistiré</option>
+                        <option value="Rechazado" {% if invitado.estado_rsvp == 'Rechazado' %}selected{% endif %}>No podré asistir</option>
+                    </select>
+                </div>
+                
+                <!-- Selector Dinámico de Cupos Confirmados -->
+                <div class="form-group" id="cupos-confirmados-group">
+                    <label for="rsvp-guests" class="heading-theme">Cantidad de Asistentes</label>
+                    <select id="rsvp-guests" name="cupos_confirmados">
+                        {% for i in range(1, invitado.cupos_asignados + 1) %}
+                        <option value="{{ i }}" {% if invitado.cupos_confirmados == i or (invitado.cupos_confirmados == 0 and i == invitado.cupos_asignados) %}selected{% endif %}>{{ i }} asistente(s)</option>
+                        {% endfor %}
+                    </select>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">Tienes un máximo de {{ invitado.cupos_asignados }} cupo(s) asignado(s).</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="rsvp-message" class="heading-theme">Mensaje Adicional</label>
+                    <textarea id="rsvp-message" name="mensaje_rsvp" rows="3" placeholder="Mensaje de felicitación o restricciones de alimentación...">{{ invitado.mensaje_rsvp or '' }}</textarea>
+                </div>
+                
+                <div class="rsvp-actions">
+                    <button type="submit" class="btn-theme heading-theme" id="rsvp-submit-btn">Guardar RSVP</button>
+                    {% if invitacion.whatsapp_confirmacion %}
+                    <button type="button" class="btn-theme heading-theme" id="rsvp-whatsapp-btn" style="background-color: #25D366; border-color: #25D366;">
+                        <i class="fab fa-whatsapp" style="margin-right: 6px;"></i> WhatsApp
+                    </button>
+                    {% endif %}
+                </div>
+            </form>
+            <div id="rsvp-alert" style="margin-top: 20px; display: none; padding: 12px; border-radius: 8px; font-weight: 500; font-size: 0.9rem; text-align: center;"></div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 11: Mensaje Final -->
+    <section class="invitation-section" id="mensaje-final" style="padding-top: 60px;">
+        <div class="floral-header"></div>
+        <p class="heading-theme" style="font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase;">Agradecemos tu Cariño</p>
+        <p class="final-message-text script-theme">{{ invitacion.mensaje_final or '¡Gracias por acompañarnos!' }}</p>
+        <div class="floral-header" style="transform: scaleY(-1); margin-top: 20px;"></div>
+    </section>
+
+    <!-- GSAP CDN para Animaciones Visuales Premium -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Scripts de la Invitación -->
+    <script src="/static/js/main.js"></script>
+    
+    <script>
+        // Establecer fecha del evento en JS para la cuenta regresiva dinámica
+        const eventDate = new Date("{{ invitacion.fecha_evento.strftime('%Y-%m-%dT%H:%M:%S') }}").getTime();
+
+        // Funciones para el Modal de Sugerencias de Música
+        function openMusicModal() {
+            const modal = document.getElementById('music-modal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMusicModal() {
+            const modal = document.getElementById('music-modal');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+            document.getElementById('music-form').reset();
+            document.getElementById('music-modal-alert').style.display = 'none';
+        }
+
+        document.getElementById('music-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('music-submit-btn');
+            const alertBox = document.getElementById('music-modal-alert');
+            const uuid = document.getElementById('music-uuid').value;
+            const cancion = document.getElementById('music-song').value;
+            const artista = document.getElementById('music-artist').value;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando...';
+
+            fetch('/invitacion/sugerir-musica', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    uuid: uuid,
+                    cancion: cancion,
+                    artista: artista
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar Sugerencia';
+                
+                alertBox.style.display = 'block';
+                if (data.success) {
+                    alertBox.className = 'badge success';
+                    alertBox.style.backgroundColor = '#d1fae5';
+                    alertBox.style.color = '#065f46';
+                    alertBox.style.padding = '15px';
+                    alertBox.style.borderRadius = '6px';
+                    
+                    const whatsappNum = {% if invitacion.whatsapp_confirmacion %}"{{ invitacion.whatsapp_confirmacion }}"{% else %}null{% endif %};
+                    if (whatsappNum) {
+                        const guestName = "{{ invitado.nombre }}";
+                        const textMsg = encodeURIComponent(`¡Hola! Soy ${guestName}. Quiero sugerir la canción "${cancion}" de ${artista} para la fiesta. 🎵`);
+                        const waUrl = `https://api.whatsapp.com/send?phone=${whatsappNum}&text=${textMsg}`;
+                        
+                        alertBox.innerHTML = `
+                            <p style="margin: 0 0 10px 0; font-weight: bold;">${data.message}</p>
+                            <a href="${waUrl}" target="_blank" class="btn-theme" style="background-color: #25D366; border-color: #25D366; color: white; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 15px; font-size: 0.85rem; text-decoration: none; border-radius: 6px; font-weight: bold; width: 100%; box-sizing: border-box;">
+                                <i class="fab fa-whatsapp" style="font-size: 1.15rem;"></i> Enviar por WhatsApp
+                            </a>
+                        `;
+                    } else {
+                        alertBox.textContent = data.message;
+                        setTimeout(() => {
+                            closeMusicModal();
+                        }, 1500);
+                    }
+                } else {
+                    alertBox.className = 'badge danger';
+                    alertBox.style.backgroundColor = '#fee2e2';
+                    alertBox.style.color = '#991b1b';
+                    alertBox.style.padding = '10px';
+                    alertBox.style.borderRadius = '6px';
+                    alertBox.textContent = data.message;
+                }
+            })
+            .catch(error => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar Sugerencia';
+                alertBox.style.display = 'block';
+                alertBox.className = 'badge danger';
+                alertBox.style.backgroundColor = '#fee2e2';
+                alertBox.style.color = '#991b1b';
+                alertBox.style.padding = '10px';
+                alertBox.style.borderRadius = '6px';
+                alertBox.textContent = 'Error de conexión. Inténtalo de nuevo.';
+                console.error('Error:', error);
+            });
+        });
+
+        // ==========================================================================
+        // CANVAS DE FUEGOS ARTIFICIALES Y CHISPAS PREMIUM
+        // ==========================================================================
+        const sparklesCanvas = document.getElementById('sparkles-canvas');
+        const sparklesCtx = sparklesCanvas.getContext('2d');
+
+        let sparklesWidth = sparklesCanvas.width = window.innerWidth;
+        let sparklesHeight = sparklesCanvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            sparklesWidth = sparklesCanvas.width = window.innerWidth;
+            sparklesHeight = sparklesCanvas.height = window.innerHeight;
+        });
+
+        const sparklesParticles = [];
+
+        class SparkleParticle {
+            constructor(x, y, color, speedX, speedY, size, gravity, life) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.speedX = speedX;
+                this.speedY = speedY;
+                this.size = size;
+                this.gravity = gravity;
+                this.alpha = 1;
+                this.decay = 1 / life;
+            }
+
+            update() {
+                this.speedY += this.gravity;
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.alpha -= this.decay;
+            }
+
+            draw() {
+                sparklesCtx.save();
+                sparklesCtx.globalAlpha = this.alpha;
+                sparklesCtx.beginPath();
+                sparklesCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                sparklesCtx.fillStyle = this.color;
+                sparklesCtx.shadowBlur = 6;
+                sparklesCtx.shadowColor = this.color;
+                sparklesCtx.fill();
+                sparklesCtx.restore();
+            }
+        }
+
+        // Crear chispas continuas flotando suavemente (fairy dust)
+        function createFairyDust() {
+            if (sparklesParticles.length < 40 && Math.random() < 0.15) {
+                const x = Math.random() * sparklesWidth;
+                const y = -10;
+                const size = Math.random() * 2 + 1;
+                const speedX = Math.random() * 0.8 - 0.4;
+                const speedY = Math.random() * 1.2 + 0.4;
+                const colors = ['#FFF4D4', '#FFD700', '#F3E5AB', '#FFFFFF'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                sparklesParticles.push(new SparkleParticle(x, y, color, speedX, speedY, size, 0.01, Math.random() * 200 + 150));
+            }
+        }
+
+        // Crear una explosión de fuegos artificiales en la posición (x, y)
+        function createFirework(x, y) {
+            const count = 35;
+            const colors = ['#FFD700', '#FFA500', '#FF4500', '#E9D2D4', '#FFFDFC', '#FF69B4'];
+            const baseColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 3.5 + 1.5;
+                const speedX = Math.cos(angle) * speed;
+                const speedY = Math.sin(angle) * speed;
+                const size = Math.random() * 2 + 0.8;
+                const gravity = 0.06;
+                const life = Math.random() * 25 + 25;
+                sparklesParticles.push(new SparkleParticle(x, y, baseColor, speedX, speedY, size, gravity, life));
+            }
+        }
+
+        // Animación loop principal
+        function sparklesLoop() {
+            sparklesCtx.clearRect(0, 0, sparklesWidth, sparklesHeight);
+
+            createFairyDust();
+
+            for (let i = sparklesParticles.length - 1; i >= 0; i--) {
+                const p = sparklesParticles[i];
+                p.update();
+                p.draw();
+                if (p.alpha <= 0 || p.x < 0 || p.x > sparklesWidth || p.y > sparklesHeight) {
+                    sparklesParticles.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(sparklesLoop);
+        }
+
+        sparklesLoop();
+
+        // Lanzamientos automáticos de fuegos artificiales de bienvenida
+        setTimeout(() => createFirework(sparklesWidth * 0.25, sparklesHeight * 0.35), 400);
+        setTimeout(() => createFirework(sparklesWidth * 0.75, sparklesHeight * 0.45), 900);
+        setTimeout(() => createFirework(sparklesWidth * 0.5, sparklesHeight * 0.25), 1500);
+
+        // Lanzar fuegos artificiales dinámicos de chispas en Scroll al pasar secciones
+        let sparklesLastScrollY = window.scrollY;
+        let sparklesScrollAccumulator = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.scrollY;
+            const diff = Math.abs(currentScroll - sparklesLastScrollY);
+            sparklesScrollAccumulator += diff;
+            sparklesLastScrollY = currentScroll;
+
+            if (sparklesScrollAccumulator > 700) {
+                sparklesScrollAccumulator = 0;
+                const side = Math.random() < 0.5 ? sparklesWidth * 0.15 : sparklesWidth * 0.85;
+                const heightY = Math.random() * (sparklesHeight * 0.5) + (sparklesHeight * 0.25);
+                createFirework(side, heightY);
+            }
+        });
+        // ==========================================
+        // FUEGOS ARTIFICIALES / CHISPAS (CANVAS)
+        // ==========================================
+        const canvas = document.getElementById('sparkles-canvas');
+        if(canvas) {
+            const ctx = canvas.getContext('2d');
+            let W = window.innerWidth;
+            let H = window.innerHeight;
+            canvas.width = W;
+            canvas.height = H;
+
+            let particles = [];
+            
+            // Función para crear fuegos artificiales al hacer scroll o interactuar
+            function createFirework(x, y) {
+                const count = 15;
+                for (let i = 0; i < count; i++) {
+                    const angle = (Math.PI * 2 / count) * i;
+                    const speed = 1 + Math.random() * 2;
+                    particles.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        r: Math.random() * 2 + 1,
+                        alpha: 1,
+                        color: Math.random() > 0.5 ? '#E2B96B' : '#ffffff'
+                    });
+                }
+            }
+
+            // Chispas continuas cayendo
+            function createSparkle() {
+                if(Math.random() > 0.9) {
+                    particles.push({
+                        x: Math.random() * W,
+                        y: -10,
+                        vx: (Math.random() - 0.5) * 1,
+                        vy: Math.random() * 1.5 + 0.5,
+                        r: Math.random() * 1.5 + 0.5,
+                        alpha: Math.random(),
+                        color: '#E2B96B'
+                    });
+                }
+            }
+
+            function animateSparkles() {
+                ctx.clearRect(0, 0, W, H);
+                
+                createSparkle();
+
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    let p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.alpha -= 0.005; // Fade out slowly
+
+                    if (p.alpha <= 0 || p.y > H || p.x < 0 || p.x > W) {
+                        particles.splice(i, 1);
+                        continue;
+                    }
+
+                    ctx.globalAlpha = p.alpha;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                requestAnimationFrame(animateSparkles);
+            }
+
+            animateSparkles();
+
+            window.addEventListener('resize', () => {
+                W = window.innerWidth;
+                H = window.innerHeight;
+                canvas.width = W;
+                canvas.height = H;
+            });
+
+            // Fuegos artificiales al hacer clic en botones
+            document.addEventListener('click', (e) => {
+                if(e.target.closest('button') || e.target.closest('.btn-theme')) {
+                    createFirework(e.clientX, e.clientY);
+                }
+            });
+        }
+
+        // Animación de decoración en la esquina inferior izquierda al hacer scroll
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+                gsap.registerPlugin(ScrollTrigger);
+                
+                // Establecer estado inicial
+                gsap.set("#scroll-decor", {
+                    x: -120,
+                    y: 120,
+                    scale: 0.4,
+                    opacity: 0
+                });
+                
+                // Animación ligada al scroll en la última sección
+                gsap.to("#scroll-decor", {
+                    scrollTrigger: {
+                        trigger: "#mensaje-final",
+                        start: "top bottom",
+                        end: "bottom bottom",
+                        scrub: true
+                    },
+                    opacity: 1,
+                    x: 0,
+                    y: 0,
+                    scale: 1,
+                    ease: "none"
+                });
+            }
+        });
+    </script>
+</body>
+</html>

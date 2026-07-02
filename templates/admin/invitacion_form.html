@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if invitacion %}Editar{% else %}Nueva{% endif %} Invitación - Momentos Digitales ⭐</title>
+
+    <!-- CSS de Administración -->
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <!-- FontAwesome Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="admin-body">
+
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <aside class="admin-sidebar">
+        <a href="/admin/dashboard" class="sidebar-brand">
+            <i class="fas fa-envelope-open-text"></i>
+            <span>Momentos Digitales ⭐</span>
+        </a>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/admin/dashboard" class="sidebar-link">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            {% if invitacion %}
+            <li>
+                <a href="/admin/invitacion/{{ invitacion.id }}/editar" class="sidebar-link active">
+                    <i class="fas fa-magic"></i>
+                    <span>Editar Invitación</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/invitacion/{{ invitacion.id }}/invitados" class="sidebar-link">
+                    <i class="fas fa-users"></i>
+                    <span>Invitados & RSVP</span>
+                </a>
+            </li>
+            {% endif %}
+            <li>
+                <a href="/admin/invitacion/nueva" class="sidebar-link {% if not invitacion %}active{% endif %}">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Nueva Invitación</span>
+                </a>
+            </li>
+            {% if usuario_actual.rol == 'SUPER_ADMIN' %}
+            <li
+                style="margin-top: 15px; padding: 0 24px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-gray); letter-spacing: 1px;">
+                <span>Super Admin</span>
+            </li>
+            <li>
+                <a href="/admin/usuarios" class="sidebar-link">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Usuarios Admins</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/admin/logout" class="sidebar-link" style="color: #ef4444; border-left-color: #ef4444;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="admin-main">
+        <header class="admin-header">
+            <div class="admin-title-group">
+                <h1>{% if invitacion %}Editar Invitación{% else %}Nueva Invitación{% endif %}</h1>
+                <p>{% if invitacion %}Modifica los contenidos, galería, música y cronograma del evento.{% else
+                    %}Registra y diseña un nuevo evento premium.{% endif %}</p>
+            </div>
+            <div>
+                <a href="/admin/dashboard" class="btn-admin outline">
+                    <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                </a>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div style="background-color: {% if category == 'success' %}#d1fae5{% else %}#fee2e2{% endif %}; 
+                                color: {% if category == 'success' %}#065f46{% else %}#991b1b{% endif %}; 
+                                padding: 15px; 
+                                border-radius: 8px; 
+                                font-size: 0.9rem; 
+                                font-weight: 500; 
+                                margin-bottom: 25px;">
+            <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"
+                style="margin-right: 6px;"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="admin-card">
+            <!-- FORMULARIO DE INVITACIÓN (Acepta archivos adjuntos) -->
+            <form
+                action="{% if invitacion %}/admin/invitacion/{{ invitacion.id }}/editar{% else %}/admin/invitacion/nueva{% endif %}"
+                method="POST" enctype="multipart/form-data">
+
+                <!-- 1. DISEÑO GENERAL -->
+                <h3
+                    style="margin-bottom: 15px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; color: var(--primary-color);">
+                    1. Configuración de Diseño</h3>
+                <div class="admin-form-grid" style="margin-bottom: 30px;">
+                    <div class="admin-form-group">
+                        <label for="titulo">Título de la Invitación (Ej: Boda de María & Juan)</label>
+                        <input type="text" id="titulo" name="titulo"
+                            value="{{ invitacion.titulo if invitacion else '' }}" required placeholder="María & Juan">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="slug">URL Slug Amigable (Ej: boda-maria-juan)</label>
+                        <input type="text" id="slug" name="slug" value="{{ invitacion.slug if invitacion else '' }}"
+                            required placeholder="boda-maria-juan">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="tipo_evento">Tipo de Evento</label>
+                        <select id="tipo_evento" name="tipo_evento" required>
+                            <option value="Boda" {% if invitacion and invitacion.tipo_evento=='Boda' %}selected{% endif
+                                %}>Boda</option>
+                            <option value="Quinceañero" {% if invitacion and invitacion.tipo_evento=='Quinceañero'
+                                %}selected{% endif %}>Quinceañero</option>
+                            <option value="Cumpleaños" {% if invitacion and invitacion.tipo_evento=='Cumpleaños'
+                                %}selected{% endif %}>Cumpleaños</option>
+                            <option value="Bautizo" {% if invitacion and invitacion.tipo_evento=='Bautizo' %}selected{%
+                                endif %}>Bautizo</option>
+                            <option value="Otro" {% if invitacion and invitacion.tipo_evento=='Otro' %}selected{% endif
+                                %}>Otro</option>
+                        </select>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="plantilla">Plantilla de Diseño Premium</label>
+                        <select id="plantilla" name="plantilla" required>
+                            <option value="elegance-gold" {% if invitacion and invitacion.plantilla=='elegance-gold'
+                                %}selected{% endif %}>Elegance Gold (Dorado & Crema)</option>
+                            <option value="royal-luxury" {% if invitacion and invitacion.plantilla=='royal-luxury'
+                                %}selected{% endif %}>Royal Luxury (Azul & Oro)</option>
+                            <option value="terracota-premium" {% if invitacion and
+                                invitacion.plantilla=='terracota-premium' %}selected{% endif %}>Terracota Premium (Tonos
+                                Tierra)</option>
+                            <option value="floral-garden" {% if invitacion and invitacion.plantilla=='floral-garden'
+                                %}selected{% endif %}>Floral Garden (Rosas & Pasteles)</option>
+                            <option value="minimal-white" {% if invitacion and invitacion.plantilla=='minimal-white'
+                                %}selected{% endif %}>Minimal White (Blanco & Negro)</option>
+                            <option value="libro-3d" {% if invitacion and invitacion.plantilla=='libro-3d'
+                                %}selected{% endif %}>Libro Mágico 3D (Animación Flipbook)</option>
+                            <option value="con-fotos" {% if invitacion and invitacion.plantilla=='con-fotos'
+                                %}selected{% endif %}>Diseño Romántico (Foto Gigante & Borde Rasgado)</option>
+                            <option value="champagne-interactivo" {% if invitacion and invitacion.plantilla=='champagne-interactivo'
+                                %}selected{% endif %}>Champagne Interactivo (Explosión de Botella)</option>
+                            <option value="video-portada" {% if invitacion and invitacion.plantilla=='video-portada'
+                                %}selected{% endif %}>Portada en Video (Animación MP4/WebM)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 1.5. IMÁGENES DE DISEÑO (PERSONALIZACIÓN MULTITEMA) -->
+                <h3 style="margin-top: 20px; margin-bottom: 15px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; color: var(--primary-color);">
+                    1.5. Imágenes de Diseño (Personalización Multitema)</h3>
+                <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Sube imágenes para personalizar completamente el diseño. Si las dejas en blanco, se usarán las imágenes por defecto del sistema.</p>
+                
+                <div class="admin-form-grid" style="margin-bottom: 30px;">
+                    <div class="admin-form-group">
+                        <label for="fondo_portada">Fondo del Sobre / Botella Cerrada / Portada Video</label>
+                        <input type="file" id="fondo_portada" name="fondo_portada" accept="image/*,video/*">
+                        {% if invitacion and invitacion.fondo_portada_url %}
+                        <small style="color: #10b981;"><i class="fas fa-check"></i> Imagen cargada</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="sello_portada">Sello de Cera / Botella Abierta (Si usa Champagne)</label>
+                        <input type="file" id="sello_portada" name="sello_portada" accept="image/*">
+                        {% if invitacion and invitacion.sello_portada_url %}
+                        <small style="color: #10b981;"><i class="fas fa-check"></i> Imagen cargada</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="decoracion_bordes">Rosas / Decoración de Esquinas</label>
+                        <input type="file" id="decoracion_bordes" name="decoracion_bordes" accept="image/*">
+                        {% if invitacion and invitacion.decoracion_bordes_url %}
+                        <small style="color: #10b981;"><i class="fas fa-check"></i> Imagen cargada</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="decoracion_centro">Corazón / Anillos / Decoración Central</label>
+                        <input type="file" id="decoracion_centro" name="decoracion_centro" accept="image/*">
+                        {% if invitacion and invitacion.decoracion_centro_url %}
+                        <small style="color: #10b981;"><i class="fas fa-check"></i> Imagen cargada</small>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 2. FECHA, HORA Y UBICACIÓN -->
+                <h3
+                    style="margin-bottom: 15px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; color: var(--primary-color);">
+                    2. Fecha & Ubicación</h3>
+                <div class="admin-form-grid" style="margin-bottom: 30px;">
+                    <div class="admin-form-group">
+                        <label for="fecha_evento">Fecha & Hora del Evento</label>
+                        <input type="datetime-local" id="fecha_evento" name="fecha_evento"
+                            value="{{ invitacion.fecha_evento.strftime('%Y-%m-%dT%H:%M') if invitacion else '' }}"
+                            required>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="lugar_nombre">Nombre del Lugar (Ej: Iglesia o Salón)</label>
+                        <input type="text" id="lugar_nombre" name="lugar_nombre"
+                            value="{{ invitacion.lugar_nombre if invitacion else '' }}"
+                            placeholder="Parroquia del Espíritu Santo">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="lugar_direccion">Dirección Física</label>
+                        <input type="text" id="lugar_direccion" name="lugar_direccion"
+                            value="{{ invitacion.lugar_direccion if invitacion else '' }}"
+                            placeholder="Calle 45 # 12-34, Ciudad">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="lugar_gmaps_url">Enlace Iframe de Google Maps (URL `src` o enlace normal)</label>
+                        <input type="text" id="lugar_gmaps_url" name="lugar_gmaps_url"
+                            value="{{ invitacion.lugar_gmaps_url if invitacion else '' }}"
+                            placeholder="https://www.google.com/maps/embed?...">
+                    </div>
+                </div>
+
+                <!-- 3. DETALLES Y TEXTOS EDITABLES -->
+                <h3
+                    style="margin-bottom: 15px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; color: var(--primary-color);">
+                    3. Textos & Detalles</h3>
+                <div class="admin-form-grid" style="margin-bottom: 30px;">
+                    <div class="admin-form-group full-width">
+                        <label for="historia">Nuestra Historia (Mensaje inicial de presentación)</label>
+                        <textarea id="historia" name="historia" rows="4"
+                            placeholder="Escribe aquí un mensaje especial o la historia del evento...">{{ invitacion.historia if invitacion else '' }}</textarea>
+                    </div>
+                    <!-- FOTOS DE NUESTRA HISTORIA -->
+                    <div class="admin-form-group">
+                        <label for="historia_foto_1">Foto Historia 1 (Izquierda)</label>
+                        <input type="file" id="historia_foto_1" name="historia_foto_1" accept="image/*">
+                        {% if invitacion and invitacion.historia_foto_1_url %}
+                        <small style="color: #10b981;"><i class="fas fa-check"></i> Foto 1 cargada</small>
+                        {% endif %}
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="historia_foto_2">Foto Historia 2 (Derecha)</label>
+                        <input type="file" id="historia_foto_2" name="historia_foto_2" accept="image/*">
+                        {% if invitacion and invitacion.historia_foto_2_url %}
+                        <small style="color: #10b981;"><i class="fas fa-check"></i> Foto 2 cargada</small>
+                        {% endif %}
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="historia_foto_3">Foto Historia 3 (Abajo Centro)</label>
+                        <input type="file" id="historia_foto_3" name="historia_foto_3" accept="image/*">
+                        {% if invitacion and invitacion.historia_foto_3_url %}
+                        <small style="color: #10b981;"><i class="fas fa-check"></i> Foto 3 cargada</small>
+                        {% endif %}
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="codigo_vestimenta">Código de Vestimenta (Ej: Formal, Guayabera, etc.)</label>
+                        <input type="text" id="codigo_vestimenta" name="codigo_vestimenta"
+                            value="{{ invitacion.codigo_vestimenta if invitacion else '' }}"
+                            placeholder="Formal / Traje Coctel">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="codigo_vestimenta_detalles">Detalles de Vestimenta (Ej: No usar blanco,
+                            etc.)</label>
+                        <input type="text" id="codigo_vestimenta_detalles" name="codigo_vestimenta_detalles"
+                            value="{{ invitacion.codigo_vestimenta_detalles if invitacion else '' }}"
+                            placeholder="Agradecemos evitar colores claros.">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="whatsapp_confirmacion">Celular de Contacto / WhatsApp Organizador</label>
+                        <input type="text" id="whatsapp_confirmacion" name="whatsapp_confirmacion"
+                            value="{{ invitacion.whatsapp_confirmacion if invitacion else '' }}"
+                            placeholder="Ej: 573001234567 (incluir código país sin +)">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="instagram_url">Enlace / Perfil de Instagram (para compartir fotos)</label>
+                        <input type="url" id="instagram_url" name="instagram_url"
+                            value="{% if invitacion and invitacion.instagram_url %}{{ invitacion.instagram_url }}{% endif %}"
+                            placeholder="https://instagram.com/usuario">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="mensaje_final">Mensaje de Cierre / Despedida</label>
+                        <input type="text" id="mensaje_final" name="mensaje_final"
+                            value="{{ invitacion.mensaje_final if invitacion else '' }}"
+                            placeholder="¡Gracias por ser parte de nuestras vidas!">
+                    </div>
+                </div>
+
+                <!-- 4. CONTRIBUCIONES / REGALOS -->
+                <h3
+                    style="margin-bottom: 15px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; color: var(--primary-color);">
+                    4. Datos de Regalos (Opcional)</h3>
+                <div class="admin-form-grid" style="margin-bottom: 30px;">
+                    <div class="admin-form-group">
+                        <label for="regalos_banco">Banco para Transferencia</label>
+                        <input type="text" id="regalos_banco" name="regalos_banco"
+                            value="{{ invitacion.regalos_banco if invitacion else '' }}"
+                            placeholder="Bancolombia Ahorros">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="regalos_cuenta">Número de Cuenta</label>
+                        <input type="text" id="regalos_cuenta" name="regalos_cuenta"
+                            value="{{ invitacion.regalos_cuenta if invitacion else '' }}" placeholder="123-456789-01">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="regalos_nequi">Celular Nequi</label>
+                        <input type="text" id="regalos_nequi" name="regalos_nequi"
+                            value="{{ invitacion.regalos_nequi if invitacion else '' }}" placeholder="3001234567">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="regalos_daviplata">Celular Daviplata</label>
+                        <input type="text" id="regalos_daviplata" name="regalos_daviplata"
+                            value="{{ invitacion.regalos_daviplata if invitacion else '' }}" placeholder="3001234567">
+                    </div>
+                    <div class="admin-form-group full-width">
+                        <label for="regalos_lista_url">Enlace a Lista de Regalos (URL externa)</label>
+                        <input type="url" id="regalos_lista_url" name="regalos_lista_url"
+                            value="{{ invitacion.regalos_lista_url if invitacion else '' }}"
+                            placeholder="https://listaderegalos.com/evento">
+                    </div>
+                </div>
+
+                <!-- 5. ARCHIVOS MULTIMEDIA (Música, Video, Fotos de Galería) -->
+                <h3
+                    style="margin-bottom: 15px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; color: var(--primary-color);">
+                    5. Carga de Multimedia</h3>
+                <div class="admin-form-grid" style="margin-bottom: 30px;">
+                    <div class="admin-form-group">
+                        <label for="musica">Música de Fondo (.mp3)</label>
+                        <input type="file" id="musica" name="musica" accept="audio/*">
+                        {% if invitacion and invitacion.musica_url %}
+                        <p style="font-size: 0.8rem; margin-top: 5px; color: var(--success-color);">
+                            <i class="fas fa-music"></i> Ya subida: {{ invitacion.musica_url.split('/')[-1] }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="video">Video de Presentación (.mp4, .webm)</label>
+                        <input type="file" id="video" name="video" accept="video/*">
+                        {% if invitacion and invitacion.video_url %}
+                        <p style="font-size: 0.8rem; margin-top: 5px; color: var(--success-color);">
+                            <i class="fas fa-video"></i> Ya subido: {{ invitacion.video_url.split('/')[-1] }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div class="admin-form-group full-width">
+                        <label for="fotos">Subir fotos a la galería (Selección múltiple)</label>
+                        <input type="file" id="fotos" name="fotos" accept="image/*" multiple>
+                        {% if invitacion and invitacion.fotos %}
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                            {% for foto in invitacion.fotos %}
+                            <div
+                                style="position: relative; width: 80px; height: 80px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-light);">
+                                <img src="/static/{{ foto.foto_url }}"
+                                    style="width: 100%; height: 100%; object-fit: cover;">
+                                <a href="/admin/invitacion/{{ invitacion.id }}/foto/{{ foto.id }}/eliminar"
+                                    style="position: absolute; top: 2px; right: 2px; background: rgba(239, 68, 68, 0.9); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; text-decoration: none;">&times;</a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 6. CRONOGRAMA / TIMELINE EDITOR -->
+                <h3
+                    style="margin-bottom: 15px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; color: var(--primary-color);">
+                    6. Cronograma del Evento</h3>
+                <div class="cronograma-editor-list" id="cronograma-list">
+                    {% if invitacion and invitacion.cronograma %}
+                    {% for item in invitacion.cronograma %}
+                    <div class="cronograma-editor-item">
+                        <input type="hidden" name="cronograma_id[]" value="{{ item.id }}">
+                        <div class="admin-form-group" style="flex: 1; margin-bottom: 0;">
+                            <label>Hora (Ej: 5:00 PM)</label>
+                            <input type="text" name="cronograma_hora[]" value="{{ item.hora }}" required>
+                        </div>
+                        <div class="admin-form-group" style="flex: 2; margin-bottom: 0;">
+                            <label>Título del Evento (Ej: Recepción)</label>
+                            <input type="text" name="cronograma_titulo[]" value="{{ item.titulo }}" required>
+                        </div>
+                        <div class="admin-form-group" style="flex: 3; margin-bottom: 0;">
+                            <label>Descripción Corta</label>
+                            <input type="text" name="cronograma_desc[]" value="{{ item.descripcion or '' }}">
+                        </div>
+                        <div class="admin-form-group" style="flex: 1; margin-bottom: 0;">
+                            <label>Icono</label>
+                            <select name="cronograma_icono[]">
+                                <option value="clock" {% if item.icono=='clock' %}selected{% endif %}>Reloj / Bienvenida</option>
+                                <option value="ring" {% if item.icono=='ring' %}selected{% endif %}>Anillos / "Sí Quiero"</option>
+                                <option value="church" {% if item.icono=='church' %}selected{% endif %}>Templo / Ceremonia</option>
+                                <option value="camera" {% if item.icono=='camera' %}selected{% endif %}>Cámara / Fotos</option>
+                                <option value="glass-cheers" {% if item.icono=='glass-cheers' %}selected{% endif %}>Copas / Brindis o Aperitivos</option>
+                                <option value="utensils" {% if item.icono=='utensils' %}selected{% endif %}>Platos & Cubiertos / Comida o Cena</option>
+                                <option value="birthday-cake" {% if item.icono=='birthday-cake' %}selected{% endif %}>Pastel / Torta</option>
+                                <option value="music" {% if item.icono=='music' %}selected{% endif %}>Música / Fiesta</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn-admin danger" style="padding: 10px; margin-top: 22px;"
+                            onclick="removeTimelineRow(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                <button type="button" class="btn-admin outline" style="margin-bottom: 30px;" onclick="addTimelineRow()">
+                    <i class="fas fa-plus"></i> Agregar Suceso al Cronograma
+                </button>
+
+                <!-- ACCIONES DEL FORMULARIO -->
+                <div
+                    style="border-top: 1px solid var(--border-light); padding-top: 25px; display: flex; gap: 15px; justify-content: flex-end;">
+                    <a href="/admin/dashboard" class="btn-admin outline">Cancelar</a>
+                    <button type="submit" class="btn-admin primary">Guardar Invitación</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Script para agregar/quitar filas de cronograma -->
+    <script>
+        function addTimelineRow() {
+            const list = document.getElementById('cronograma-list');
+            const item = document.createElement('div');
+            item.className = 'cronograma-editor-item';
+            item.innerHTML = `
+                <input type="hidden" name="cronograma_id[]" value="nuevo">
+                <div class="admin-form-group" style="flex: 1; margin-bottom: 0;">
+                    <label>Hora</label>
+                    <input type="text" name="cronograma_hora[]" placeholder="6:00 PM" required>
+                </div>
+                <div class="admin-form-group" style="flex: 2; margin-bottom: 0;">
+                    <label>Título del Evento</label>
+                    <input type="text" name="cronograma_titulo[]" placeholder="Ceremonia" required>
+                </div>
+                <div class="admin-form-group" style="flex: 3; margin-bottom: 0;">
+                    <label>Descripción Corta</label>
+                    <input type="text" name="cronograma_desc[]" placeholder="Palabras de los novios">
+                </div>
+                <div class="admin-form-group" style="flex: 1; margin-bottom: 0;">
+                    <label>Icono</label>
+                    <select name="cronograma_icono[]">
+                        <option value="clock">Reloj / Bienvenida</option>
+                        <option value="ring">Anillos / "Sí Quiero"</option>
+                        <option value="church">Ceremonia</option>
+                        <option value="camera">Fotos</option>
+                        <option value="glass-cheers">Brindis / Aperitivos</option>
+                        <option value="utensils">Comida / Cena</option>
+                        <option value="birthday-cake">Pastel</option>
+                        <option value="music">Fiesta</option>
+                    </select>
+                </div>
+                <button type="button" class="btn-admin danger" style="padding: 10px; margin-top: 22px;" onclick="removeTimelineRow(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            list.appendChild(item);
+        }
+
+        function removeTimelineRow(button) {
+            button.closest('.cronograma-editor-item').remove();
+        }
+    </script>
+</body>
+
+</html>

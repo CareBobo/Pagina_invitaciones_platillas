@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios Administradores - Momentos Digitales ⭐</title>
+
+    <!-- CSS de Administración -->
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <!-- FontAwesome Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="admin-body">
+
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <aside class="admin-sidebar">
+        <a href="/admin/dashboard" class="sidebar-brand">
+            <i class="fas fa-envelope-open-text"></i>
+            <span>Momentos Digitales ⭐</span>
+        </a>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/admin/dashboard" class="sidebar-link">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            {% if invitacion_activa %}
+            <li>
+                <a href="/admin/invitacion/{{ invitacion_activa.id }}/editar" class="sidebar-link">
+                    <i class="fas fa-magic"></i>
+                    <span>Editar Invitación</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/invitacion/{{ invitacion_activa.id }}/invitados" class="sidebar-link">
+                    <i class="fas fa-users"></i>
+                    <span>Invitados & RSVP</span>
+                </a>
+            </li>
+            {% endif %}
+            <li>
+                <a href="/admin/invitacion/nueva" class="sidebar-link">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Nueva Invitación</span>
+                </a>
+            </li>
+
+            {% if usuario_actual.rol == 'SUPER_ADMIN' %}
+            <li
+                style="margin-top: 15px; padding: 0 24px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-gray); letter-spacing: 1px;">
+                <span>Super Admin</span>
+            </li>
+            <li>
+                <a href="/admin/usuarios" class="sidebar-link active">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Usuarios Admins</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/admin/logout" class="sidebar-link" style="color: #ef4444; border-left-color: #ef4444;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="admin-main">
+        <header class="admin-header">
+            <div class="admin-title-group">
+                <h1>Usuarios Administradores</h1>
+                <p>Gestiona cuentas de organizadores y roles de administración de la plataforma.</p>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div style="background-color: {% if category == 'success' %}#d1fae5{% else %}#fee2e2{% endif %}; 
+                                color: {% if category == 'success' %}#065f46{% else %}#991b1b{% endif %}; 
+                                padding: 15px; 
+                                border-radius: 8px; 
+                                font-size: 0.9rem; 
+                                font-weight: 500; 
+                                margin-bottom: 25px;">
+            <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"
+                style="margin-right: 6px;"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+            <!-- CREAR NUEVO USUARIO -->
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; font-weight: 600;">Registrar Admin</h3>
+                <form action="/admin/usuarios/agregar" method="POST">
+                    <div class="admin-form-group">
+                        <label for="username">Usuario (Login)</label>
+                        <input type="text" id="username" name="username" placeholder="juan_perez" required>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="nombre">Nombre Completo</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Juan Pérez" required>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" placeholder="Contraseña de acceso"
+                            required>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="rol">Rol del Usuario</label>
+                        <select id="rol" name="rol" required>
+                            <option value="ADMIN_ORGANIZADOR">Admin Organizador</option>
+                            <option value="SUPER_ADMIN">Super Administrador</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-admin primary"
+                        style="width: 100%; justify-content: center; margin-top: 10px;">
+                        <i class="fas fa-plus"></i> Crear Usuario
+                    </button>
+                </form>
+            </div>
+
+            <!-- TABLA DE USUARIOS EXISTENTES -->
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; font-weight: 600;">Lista de Usuarios</h3>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Usuario</th>
+                                <th>Rol</th>
+                                <th>Fecha Registro</th>
+                                <th style="text-align: right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in usuarios %}
+                            <tr>
+                                <td style="font-weight: 600;">{{ user.nombre }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>
+                                    {% if user.rol == 'SUPER_ADMIN' %}
+                                    <span class="badge danger" style="background-color: #fee2e2; color: #991b1b;">Super
+                                        Admin</span>
+                                    {% else %}
+                                    <span class="badge success"
+                                        style="background-color: #d1fae5; color: #065f46;">Organizador</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
+                                <td style="text-align: right;">
+                                    {% if user.id != usuario_actual.id %}
+                                    <a href="/admin/usuarios/{{ user.id }}/eliminar" class="btn-icon-only"
+                                        style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.2);"
+                                        title="Eliminar Usuario"
+                                        onclick="return confirm('¿Estás seguro de eliminar este usuario?')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                    {% else %}
+                                    <span style="font-size: 0.8rem; color: var(--text-gray); font-style: italic;">En
+                                        sesión</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>

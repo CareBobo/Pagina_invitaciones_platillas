@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ invitacion.titulo }} - Libro Mágico</title>
+
+    <link rel="stylesheet" href="/static/css/book_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Great Vibes para cursiva bonita, Montserrat para texto limpio -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* Estilos dinámicos inyectados desde Python */
+        .floral-bg {
+                {
+                % if invitacion.decoracion_bordes_url %
+            }
+
+            background-image: url('/static/{{ invitacion.decoracion_bordes_url }}') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+
+                {
+                % endif %
+            }
+
+            background-color: #d1eff7 !important;
+            /* Azul agua marina claro */
+        }
+
+        .page-cover {
+                {
+                % if invitacion.fondo_portada_url %
+            }
+
+            background-image: url('/static/{{ invitacion.fondo_portada_url }}') !important;
+            background-size: cover !important;
+            background-position: center !important;
+
+                {
+                % endif %
+            }
+        }
+    </style>
+
+<body
+    style="background-image: url('/static/assets/fondo_patio.jpg'); background-size: cover; background-position: center; background-attachment: fixed; margin: 0; overflow: hidden; perspective: 1200px;">
+
+    <!-- Aviso para forzar rotación en celulares -->
+    <div id="rotate-warning">
+        <i class="fas fa-mobile-alt rotate-icon"></i>
+        <p>Por favor, gira tu celular en modo horizontal para vivir la experiencia completa.</p>
+    </div>
+
+    <style>
+        #rotate-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            color: #d4af37;
+            z-index: 999999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .rotate-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: phoneRotate 2s infinite ease-in-out;
+        }
+
+        @keyframes phoneRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            50% {
+                transform: rotate(90deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        @media screen and (orientation: portrait) and (max-width: 900px) {
+            #rotate-warning {
+                display: flex;
+            }
+        }
+    </style>
+
+    <!-- Canvas para efectos -->
+    <canvas id="magic-canvas"></canvas>
+
+    {% if invitacion.musica_url %}
+    <audio id="bg-music" loop>
+        <source src="/static/{{ invitacion.musica_url }}" type="audio/mpeg">
+    </audio>
+    <button id="music-toggle" class="music-toggle" style="display:none;">
+        <i class="fas fa-volume-mute"></i>
+    </button>
+    {% endif %}
+
+
+    <!-- MODAL DE ÍNDICE -->
+    <div id="index-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 999999; justify-content: center; align-items: center;">
+        <div
+            style="background: var(--paper-bg); padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; text-align: center; position: relative;">
+            <button id="close-index" class="magical-btn small"
+                style="position: absolute; top: 10px; right: 10px; padding: 5px 10px; background: #333; color: white;"><i
+                    class="fas fa-times"></i></button>
+            <h2 class="cover-subtitle" style="margin-bottom: 20px; font-size: 1.8rem; color: #333;">Índice del Libro
+            </h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px;">
+                <div class="index-item" onclick="goToPage(0)"
+                    style="cursor: pointer; border: 2px solid var(--primary-color); border-radius: 10px; padding: 15px; background: rgba(255,255,255,0.9); transition: transform 0.2s;">
+                    <i class="fas fa-book"
+                        style="font-size: 2rem; color: var(--primary-color); margin-bottom: 10px;"></i><br><b
+                        style="color: #333;">Portada</b>
+                </div>
+                <div class="index-item" onclick="goToPage(2)"
+                    style="cursor: pointer; border: 2px solid var(--primary-color); border-radius: 10px; padding: 15px; background: rgba(255,255,255,0.9); transition: transform 0.2s;">
+                    <i class="fas fa-heart"
+                        style="font-size: 2rem; color: var(--primary-color); margin-bottom: 10px;"></i><br><b
+                        style="color: #333;">Historia</b>
+                </div>
+                <div class="index-item" onclick="goToPage(3)"
+                    style="cursor: pointer; border: 2px solid var(--primary-color); border-radius: 10px; padding: 15px; background: rgba(255,255,255,0.9); transition: transform 0.2s;">
+                    <i class="fas fa-hourglass-half"
+                        style="font-size: 2rem; color: var(--primary-color); margin-bottom: 10px;"></i><br><b
+                        style="color: #333;">Regresiva</b>
+                </div>
+                <div class="index-item" onclick="goToPage(4)"
+                    style="cursor: pointer; border: 2px solid var(--primary-color); border-radius: 10px; padding: 15px; background: rgba(255,255,255,0.9); transition: transform 0.2s;">
+                    <i class="fas fa-map-marker-alt"
+                        style="font-size: 2rem; color: var(--primary-color); margin-bottom: 10px;"></i><br><b
+                        style="color: #333;">Ubicación</b>
+                </div>
+                <div class="index-item" onclick="goToPage(5)"
+                    style="cursor: pointer; border: 2px solid var(--primary-color); border-radius: 10px; padding: 15px; background: rgba(255,255,255,0.9); transition: transform 0.2s;">
+                    <i class="fas fa-user-tie"
+                        style="font-size: 2rem; color: var(--primary-color); margin-bottom: 10px;"></i><br><b
+                        style="color: #333;">Vestimenta</b>
+                </div>
+                <div class="index-item" onclick="goToPage(6)"
+                    style="cursor: pointer; border: 2px solid var(--primary-color); border-radius: 10px; padding: 15px; background: rgba(255,255,255,0.9); transition: transform 0.2s;">
+                    <i class="fas fa-envelope-open-text"
+                        style="font-size: 2rem; color: var(--primary-color); margin-bottom: 10px;"></i><br><b
+                        style="color: #333;">Asistencia</b>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnIndex = document.getElementById('btn-index');
+            const modalIndex = document.getElementById('index-modal');
+            const closeIndex = document.getElementById('close-index');
+
+            if (btnIndex) {
+                btnIndex.addEventListener('click', () => {
+                    modalIndex.style.display = 'flex';
+                });
+            }
+            if (closeIndex) {
+                closeIndex.addEventListener('click', () => {
+                    modalIndex.style.display = 'none';
+                });
+            }
+        });
+
+        function goToPage(pageNum) {
+            if (window.pageFlip) {
+                window.pageFlip.flip(pageNum);
+            }
+            document.getElementById('index-modal').style.display = 'none';
+        }
+
+        // Efecto hover simple para los items
+        document.querySelectorAll('.index-item').forEach(item => {
+            item.addEventListener('mouseenter', e => e.currentTarget.style.transform = 'scale(1.05)');
+            item.addEventListener('mouseleave', e => e.currentTarget.style.transform = 'scale(1)');
+        });
+    </script>
+
+    <div class="container" id="main-container"
+        style="perspective: 1500px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;">
+
+        <div class="book-3d-wrapper"
+            style="transform: rotateX(5deg) scale(1.05); transition: transform 0.5s ease; box-shadow: 0 40px 60px rgba(0,0,0,0.6); border-radius: 5px; margin-bottom: 30px;">
+            <div class="flip-book" id="flip-book">
+
+                <!-- PORTADA (Imagen Completa con textos dinámicos) -->
+                <div class="page page-cover page-cover-top" data-density="hard">
+                    <div class="page-content center-content romantic-cover"
+                        style="background-image: url('/static/assets/portada_libro.jpg') !important; background-size: 100% 100% !important; background-position: center !important; background-repeat: no-repeat !important; border: none !important; align-items: center; justify-content: flex-start; padding-top: 15%;">
+
+                        <div class="cover-text-layer"
+                            style="text-align: center; width: 80%; z-index: 10; margin-top: 0;">
+                            <!-- NUESTRA BODA (Dorado, elegante) -->
+                            <p
+                                style="color: #bfa15f; font-family: 'Times New Roman', serif; font-size: 1.2rem; letter-spacing: 3px; margin: 0; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(255,255,255,0.8);">
+                                Nuestra Boda</p>
+
+                            <!-- NOMBRES (Cursiva, morado/vino) -->
+                            <h1
+                                style="color: #603561; font-family: 'Great Vibes', cursive; font-size: 2.0rem; margin: 30px 0 0 0; line-height: 1.1; text-shadow: 1px 1px 3px rgba(255,255,255,0.8);">
+                                {{ invitacion.titulo }}</h1>
+                        </div>
+
+                        <!-- NOMBRE DEL INVITADO (Abajo) -->
+                        <div
+                            style="position: absolute; bottom: 12%; left: 0; width: 100%; text-align: center; z-index: 10;">
+                            <p
+                                style="color: #4a154b; font-family: 'Great Vibes', cursive; font-size: 2.2rem; margin: 0; text-shadow: 1px 1px 3px rgba(255,255,255,0.8); line-height: 1;">
+                                {{ invitado.nombre }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INTERIOR PORTADA (Página 1 - Video) -->
+                <div class="page page-inner-cover" data-density="hard">
+                    <div class="page-content center-content floral-bg">
+                        <div class="content-box"
+                            style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; padding: 10px; background: rgba(255,255,255,0.7); backdrop-filter: blur(5px); border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+
+                            <h3 class="section-title" style="margin-bottom: 20px; font-size: 2rem; color: #603561;">
+                                Nuestro Video</h3>
+
+                            <!-- Contenedor del Video -->
+                            <div
+                                style="width: 100%; aspect-ratio: 9/16; background-color: #1a1a1a; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 4px solid #d4af37; position: relative;">
+                                {% if invitacion.video_url %}
+                                <video class="zoomable" src="{{ invitacion.video_url }}"
+                                    style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;"></video>
+                                {% else %}
+                                <div
+                                    style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; color: #fff;">
+                                    <i class="fas fa-play-circle"
+                                        style="font-size: 4rem; color: #d4af37; margin-bottom: 15px; opacity: 0.8;"></i>
+                                    <p
+                                        style="font-family: 'Montserrat', sans-serif; text-align: center; padding: 0 20px; color: #ccc;">
+                                        Reproducir Video</p>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Mensaje inferior -->
+                            <p class="romantic-text"
+                                style="margin-top: 15px; text-align: center; font-size: 1.1rem; color: #333;">Un pequeño
+                                vistazo<br>a nuestra historia...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PÁGINA 2: NUESTRA HISTORIA -->
+                <div class="page">
+                    <div class="page-content floral-bg"
+                        style="padding: 0; width: 100%; height: 100%; display: flex; flex-direction: column;">
+                        <!-- Contenedor principal con bordes dorados (llenando la pantalla) -->
+                        <div
+                            style="border: 2px solid #d4af37; margin: 15px; height: calc(100% - 30px); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; position: relative; padding: 10px; box-sizing: border-box; overflow: hidden;">
+
+                            <!-- Esquinas decorativas doradas -->
+                            <div
+                                style="position: absolute; top: 8px; left: 8px; width: 25px; height: 25px; border-top: 2px solid #d4af37; border-left: 2px solid #d4af37;">
+                            </div>
+                            <div
+                                style="position: absolute; top: 8px; right: 8px; width: 25px; height: 25px; border-top: 2px solid #d4af37; border-right: 2px solid #d4af37;">
+                            </div>
+                            <div
+                                style="position: absolute; bottom: 8px; left: 8px; width: 25px; height: 25px; border-bottom: 2px solid #d4af37; border-left: 2px solid #d4af37;">
+                            </div>
+                            <div
+                                style="position: absolute; bottom: 8px; right: 8px; width: 25px; height: 25px; border-bottom: 2px solid #d4af37; border-right: 2px solid #d4af37;">
+                            </div>
+
+                            <div
+                                style="text-align: center; margin-bottom: 10px; margin-top: 5px; z-index: 2; width: 100%;">
+                                <h3
+                                    style="font-family: 'Great Vibes', cursive; font-size: 2.2rem; color: #d4af37; margin: 0; line-height: 0.8; font-weight: normal;">
+                                    Nuestra</h3>
+                                <h3
+                                    style="font-family: 'Times New Roman', serif; font-size: 1.1rem; color: #d4af37; margin: 0; letter-spacing: 3px; text-transform: uppercase;">
+                                    Historia</h3>
+                            </div>
+
+                            <!-- Collage Layout: Foto 1 y Texto Lado a Lado -->
+                            <div
+                                style="display: flex; flex-direction: column; gap: 10px; width: 100%; z-index: 2; flex-grow: 1; justify-content: space-between; overflow: hidden; min-height: 0;">
+
+                                <div
+                                    style="display: flex; flex-direction: row; gap: 10px; width: 100%; align-items: center; flex: 1; min-height: 0;">
+                                    <!-- Foto 1 (Izquierda) -->
+                                    <div
+                                        style="width: 50%; height: 100%; border: 2px solid #d4af37; padding: 3px; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                                        <img class="zoomable"
+                                            src="{{ ('/static/' + invitacion.historia_foto_1_url) if invitacion.historia_foto_1_url else '/static/assets/portada_libro.jpg' }}"
+                                            style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;">
+                                    </div>
+                                    <!-- Texto (Derecha) -->
+                                    <div
+                                        style="width: 50%; height: 100%; display: flex; align-items: center; overflow-y: auto;">
+                                        <p class="romantic-text"
+                                            style="color: #333; font-size: 0.85rem; text-align: left; line-height: 1.3; text-shadow: none; margin: 0; font-family: 'Times New Roman', serif; white-space: pre-line;">
+                                            {{ invitacion.historia }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Foto 2 y 3 (Abajo) -->
+                                <div
+                                    style="display: flex; flex-direction: row; gap: 10px; width: 100%; flex: 1; align-items: flex-end; min-height: 0;">
+                                    <div
+                                        style="width: 55%; height: 100%; border: 2px solid #d4af37; padding: 3px; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                                        <img class="zoomable"
+                                            src="{{ ('/static/' + invitacion.historia_foto_2_url) if invitacion.historia_foto_2_url else '/static/assets/portada_libro.jpg' }}"
+                                            style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;">
+                                    </div>
+                                    <div
+                                        style="width: 45%; height: 75%; border: 2px solid #d4af37; padding: 3px; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                                        <img class="zoomable"
+                                            src="{{ ('/static/' + invitacion.historia_foto_3_url) if invitacion.historia_foto_3_url else '/static/assets/portada_libro.jpg' }}"
+                                            style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PÁGINA 3: CUENTA REGRESIVA -->
+                <div class="page">
+                    <div class="page-content center-content floral-bg">
+                        <div class="content-box">
+                            <h3 class="section-title">Falta muy poco</h3>
+                            <div class="countdown-container">
+                                <div class="countdown-box"><span id="cd-days">00</span><small>Días</small></div>
+                                <div class="countdown-box"><span id="cd-hours">00</span><small>Hrs</small></div>
+                                <div class="countdown-box"><span id="cd-mins">00</span><small>Min</small></div>
+                                <div class="countdown-box"><span id="cd-secs">00</span><small>Seg</small></div>
+                            </div>
+                            <input type="hidden" id="event-date"
+                                value="{{ invitacion.fecha_evento.strftime('%Y-%m-%dT%H:%M:%S') }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PÁGINA 4: UBICACIÓN (Dropzone 3) -->
+                <div class="page">
+                    <div class="page-content center-content floral-bg">
+                        <div class="content-box">
+
+                            <h3 class="section-title">Ubicación</h3>
+                            <div id="content-location" style="opacity: 0; transition: 1s; text-align: center;">
+                                <p class="romantic-text"><i class="far fa-calendar"></i> {{
+                                    invitacion.fecha_evento.strftime('%d de %B, %Y - %I:%M %p') }}</p>
+                                <p class="romantic-text"><i class="fas fa-map-marker-alt"></i> <strong>{{
+                                        invitacion.lugar_nombre }}</strong></p>
+                                {% if invitacion.lugar_gmaps_url %}
+                                <a href="{{ invitacion.lugar_gmaps_url }}" target="_blank" class="magical-btn small"
+                                    style="margin-top:10px;"><i class="fas fa-map-marked-alt"></i> Mapa</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PÁGINA 5: CÓDIGO DE VESTIMENTA (Dropzone 4) -->
+                <div class="page">
+                    <div class="page-content center-content floral-bg">
+                        <div class="content-box">
+
+                            <h3 class="section-title">Vestimenta</h3>
+                            <div id="content-dress" style="opacity: 0; transition: 1s; text-align: center;">
+                                <h4 class="dress-title">{{ invitacion.codigo_vestimenta }}</h4>
+                                <p class="dress-detail romantic-text">{{ invitacion.codigo_vestimenta_detalles }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PÁGINA 6: RSVP -->
+                <div class="page">
+                    <div class="page-content center-content floral-bg">
+                        <div class="content-box">
+                            <h3 class="section-title">Asistencia</h3>
+                            <form id="rsvp-book-form" class="book-form">
+                                <input type="hidden" name="uuid" value="{{ invitado.uuid }}">
+                                <div class="form-group">
+                                    <input type="text" value="{{ invitado.nombre }}" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <select name="estado_rsvp" required>
+                                        <option value="Confirmado">Sí, asistiré</option>
+                                        <option value="Rechazado">No podré asistir</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="magical-btn small">Guardar</button>
+                            </form>
+                            <div id="rsvp-alert"
+                                style="display:none; text-align:center; margin-top:10px; font-size: 0.8rem;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PÁGINA 7: DESPEDIDA -->
+                <div class="page">
+                    <div class="page-content center-content floral-bg">
+                        <div class="content-box">
+                            <p class="final-msg"
+                                style="font-size: 2.2rem; font-family: 'Great Vibes', cursive; color: var(--primary-color); text-align:center;">
+                                {{ invitacion.mensaje_final }}</p>
+                            <img src="/static/assets/circle-frame.png"
+                                style="width: 150px; margin-top:20px; opacity:0.5;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTRAPORTADA -->
+                <div class="page page-cover page-cover-bottom" data-density="hard">
+                    <div class="page-content center-content floral-bg">
+                        <div class="cover-design back-cover">
+                            <p
+                                style="color: #666; font-family: 'Montserrat', sans-serif; margin-top: 20px; background: rgba(255,255,255,0.7); padding: 5px 15px; border-radius: 20px;">
+                                Álbum Completado</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CONTROLES DEBAJO DEL LIBRO -->
+        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px; z-index: 100;">
+            <!-- Indicación de cómo abrir el libro -->
+            <p
+                style="color: #0e0d0d; font-family: 'Monotype Corsiva'; font-size: 2.1rem; margin-bottom: 25px; font-weight: 900; background: rgba(10, 10, 10, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 12px 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(212,175,55,0.4); letter-spacing: 1px; animation: pulse 2s infinite;">
+                <i class="fas fa-hand-pointer" style="color: #d4af37; text-shadow: 0 0 10px rgba(212,175,55,0.8);"></i>
+                Toca una esquina del libro para abrirlo
+            </p>
+
+            <!-- BOTÓN DE ÍNDICE -->
+            <button id="btn-index-bottom"
+                style="font-family: 'Bernard MT Condensed'; font-size: 1.2rem; padding: 15px 45px; border-radius: 50px; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; color: #0a0a0a; background: linear-gradient(135deg, rgba(20,20,20,0.6), rgba(0,0,0,0.3)); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(212,175,55,0.5); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(212,175,55,0.2), 0 0 20px rgba(212,175,55,0.4); font-weight: 600; transition: all 0.3s ease; text-shadow: 0 0 8px rgba(255,255,255,0.6);"
+                onmouseover="this.style.boxShadow='0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(212,175,55,0.4), 0 0 35px rgba(212,175,55,0.9)'; this.style.transform='scale(1.05)';"
+                onmouseout="this.style.boxShadow='0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(212,175,55,0.2), 0 0 20px rgba(212,175,55,0.4)'; this.style.transform='scale(1)';">
+                <i class="fas fa-layer-group"
+                    style="color: #d4af37; margin-right: 8px; text-shadow: 0 0 10px #d4af37;"></i> MENÚ DEL LIBRO
+            </button>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX MODAL -->
+    <div id="lightbox-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 9999999; justify-content: center; align-items: center; flex-direction: column;">
+        <span id="lightbox-close"
+            style="position: absolute; top: 20px; right: 30px; color: white; font-size: 3rem; cursor: pointer; text-shadow: 0 0 10px rgba(0,0,0,0.5);">&times;</span>
+        <div id="lightbox-content"
+            style="max-width: 95%; max-height: 90%; display: flex; justify-content: center; align-items: center;">
+            <!-- Contenido dinámico (img o video) -->
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('btn-index-bottom').addEventListener('click', () => {
+            document.getElementById('index-modal').style.display = 'flex';
+        });
+    </script>
+    <!-- stPageFlip Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.min.js"></script>
+    <!-- Incluir Draggabilly o implementarlo en Vanilla JS. Haremos Vanilla JS para no depender de librerías extras -->
+
+    <script src="/static/js/particles_effects.js"></script>
+    <script src="/static/js/book_logic.js"></script>
+</body>
+
+</html>

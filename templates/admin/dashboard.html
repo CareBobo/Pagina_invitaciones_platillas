@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Momentos Digitales ⭐</title>
+    
+    <!-- CSS de Administración -->
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <!-- FontAwesome Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="admin-body">
+
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <aside class="admin-sidebar">
+        <a href="/admin/dashboard" class="sidebar-brand">
+            <i class="fas fa-envelope-open-text"></i>
+            <span>Momentos Digitales ⭐</span>
+        </a>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/admin/dashboard" class="sidebar-link active">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            {% if invitacion_activa %}
+            <li>
+                <a href="/admin/invitacion/{{ invitacion_activa.id }}/editar" class="sidebar-link">
+                    <i class="fas fa-magic"></i>
+                    <span>Editar Invitación</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/invitacion/{{ invitacion_activa.id }}/invitados" class="sidebar-link">
+                    <i class="fas fa-users"></i>
+                    <span>Invitados & RSVP</span>
+                </a>
+            </li>
+            {% endif %}
+            <li>
+                <a href="/admin/invitacion/nueva" class="sidebar-link">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Nueva Invitación</span>
+                </a>
+            </li>
+            
+            <!-- Rol Super Admin -->
+            {% if usuario_actual.rol == 'SUPER_ADMIN' %}
+            <li style="margin-top: 15px; padding: 0 24px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-gray); letter-spacing: 1px;">
+                <span>Super Admin</span>
+            </li>
+            <li>
+                <a href="/admin/usuarios" class="sidebar-link">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Usuarios Admins</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/admin/logout" class="sidebar-link" style="color: #ef4444; border-left-color: #ef4444;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="admin-main">
+        <header class="admin-header">
+            <div class="admin-title-group">
+                {% if invitacion_activa %}
+                    <h1>{{ invitacion_activa.titulo }}</h1>
+                    <p>Dashboard estadístico del evento ({{ invitacion_activa.tipo_evento }})</p>
+                {% else %}
+                    <h1>Bienvenido, {{ usuario_actual.nombre }}</h1>
+                    <p>Crea tu primera invitación digital para comenzar.</p>
+                {% endif %}
+            </div>
+            
+            <!-- Selector de Invitación Activa -->
+            {% if todas_invitaciones %}
+            <div>
+                <select onchange="location = this.value;" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-light); font-family: inherit; font-size: 0.9rem; cursor: pointer;">
+                    {% for inv in todas_invitaciones %}
+                    <option value="/admin/dashboard?inv_id={{ inv.id }}" {% if invitacion_activa and inv.id == invitacion_activa.id %}selected{% endif %}>
+                        {{ inv.titulo }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+        </header>
+
+        {% if invitacion_activa %}
+        <!-- Tarjetas de Métricas -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Total Invitados</h3>
+                    <div class="stat-value">{{ stats.total_invitados }}</div>
+                </div>
+                <div class="stat-icon primary">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Confirmados</h3>
+                    <div class="stat-value">{{ stats.total_confirmados }}</div>
+                </div>
+                <div class="stat-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Pendientes</h3>
+                    <div class="stat-value">{{ stats.total_pendientes }}</div>
+                </div>
+                <div class="stat-icon warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>No Asistirán</h3>
+                    <div class="stat-value">{{ stats.total_rechazados }}</div>
+                </div>
+                <div class="stat-icon danger">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Asistencia</h3>
+                    <div class="stat-value">{{ stats.porcentaje_asistencia }}%</div>
+                </div>
+                <div class="stat-icon primary" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color);">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gráficos y Últimas confirmaciones -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 30px;">
+            <!-- Gráfica Chart.js -->
+            <div class="admin-card">
+                <div class="card-header-flex">
+                    <h2>Estado de RSVP</h2>
+                </div>
+                <div style="position: relative; height: 260px; display: flex; justify-content: center;">
+                    <canvas id="rsvp-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Últimas respuestas -->
+            <div class="admin-card">
+                <div class="card-header-flex">
+                    <h2>Respuestas Recientes</h2>
+                    <a href="/admin/invitacion/{{ invitacion_activa.id }}/invitados" class="btn-admin outline" style="padding: 6px 12px; font-size: 0.75rem;">Ver Todos</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Mesa</th>
+                                <th>Cupos</th>
+                                <th>RSVP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inv in ultimos_invitados %}
+                            <tr>
+                                <td style="font-weight: 500;">{{ inv.nombre }}</td>
+                                <td>{{ inv.mesa }}</td>
+                                <td>{{ inv.cupos_confirmados }} / {{ inv.cupos_asignados }}</td>
+                                <td>
+                                    {% if inv.estado_rsvp == 'Confirmado' %}
+                                        <span class="badge success">Sí</span>
+                                    {% elif inv.estado_rsvp == 'Rechazado' %}
+                                        <span class="badge danger">No</span>
+                                    {% else %}
+                                        <span class="badge warning">Pendiente</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: var(--text-gray);">No hay respuestas registradas aún.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sugerencias de Música -->
+        <div class="admin-card" style="margin-bottom: 30px;">
+            <div class="card-header-flex">
+                <h2><i class="fas fa-music" style="margin-right: 8px; color: var(--primary-color);"></i>Canciones Sugeridas para la Fiesta</h2>
+                <span style="font-size: 0.85rem; color: var(--text-gray); font-weight: 500;">Total: {{ canciones_sugeridas|length }} canciones</span>
+            </div>
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Canción</th>
+                            <th>Artista / Grupo</th>
+                            <th>Sugerido por</th>
+                            <th>Fecha</th>
+                            <th style="text-align: right;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sug in canciones_sugeridas %}
+                        <tr>
+                            <td style="font-weight: 600; color: var(--text-dark);">{{ sug.cancion }}</td>
+                            <td style="font-weight: 500;">{{ sug.artista }}</td>
+                            <td>{{ sug.sugerido_por or 'Invitado Anónimo' }}</td>
+                            <td>{{ sug.created_at.strftime('%d/%m/%Y %I:%M %p') }}</td>
+                            <td style="text-align: right;">
+                                <a href="/admin/musica-sugerida/{{ sug.id }}/eliminar" class="btn-icon-only" style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.2);" title="Eliminar Sugerencia" onclick="return confirm('¿Estás seguro de eliminar esta sugerencia?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px 0; color: var(--text-gray);">Ningún invitado ha sugerido canciones todavía. ¡La lista está vacía!</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <!-- Sin invitaciones registradas -->
+        <div class="admin-card" style="text-align: center; padding: 60px;">
+            <i class="fas fa-envelope-open-text" style="font-size: 4rem; color: var(--text-gray); margin-bottom: 20px;"></i>
+            <h2>Comienza a Crear</h2>
+            <p style="color: var(--text-gray); max-width: 500px; margin: 10px auto 25px auto;">
+                Diseña invitaciones web interactivas sofisticadas con sobre 3D, música, galerías, cronogramas y más.
+            </p>
+            <a href="/admin/invitacion/nueva" class="btn-admin primary">
+                <i class="fas fa-plus"></i> Crear Mi Primera Invitación
+            </a>
+        </div>
+        {% endif %}
+    </main>
+
+    {% if invitacion_activa %}
+    <script>
+        // Configuración de Chart.js para estadísticas RSVP
+        const ctx = document.getElementById('rsvp-chart').getContext('2d');
+        const rsvpChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Confirmados', 'Pendientes', 'No Asistirán'],
+                datasets: [{
+                    data: [
+                        {{ stats.total_confirmados }},
+                        {{ stats.total_pendientes }},
+                        {{ stats.total_rechazados }}
+                    ],
+                    backgroundColor: [
+                        '#10b981', // Verde éxito
+                        '#f59e0b', // Amarillo advertencia
+                        '#ef4444'  // Rojo peligro
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                family: 'Inter',
+                                size: 12
+                            },
+                            color: '#64748b'
+                        }
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

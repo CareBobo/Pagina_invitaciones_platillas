@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ invitacion.titulo }} - Invitación Especial</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0d1b3e">
+    <link rel="apple-touch-icon" href="/static/assets/icon-192.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700&family=Great+Vibes&display=swap"
+        rel="stylesheet">
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0a0c14;
+        }
+
+        /* =====================================================
+           FONDO: imagen COMPLETA siempre visible (sin recorte)
+           — usa <img> con object-fit: contain para mostrar
+             la imagen entera tanto en PC como en móvil
+           ===================================================== */
+        .portada-bg {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 0;
+            background: #0a0c14;
+            /* color de relleno si sobran bordes */
+        }
+
+        /* ← CAMBIA EL NOMBRE DEL ARCHIVO AQUÍ para cambiar la imagen */
+        .portada-bg-img {
+            width: 100%;
+            height: 100%;
+            /* contain = imagen completa sin recorte */
+            object-fit: contain;
+            object-position: center center;
+            display: block;
+        }
+
+        /* Overlay degradado en la parte inferior para que el texto sea legible */
+        .portada-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                    rgba(0, 0, 0, 0.0) 0%,
+                    rgba(0, 0, 0, 0.0) 55%,
+                    rgba(0, 0, 0, 0.45) 80%,
+                    rgba(0, 0, 0, 0.65) 100%);
+            pointer-events: none;
+        }
+
+        /* =====================================================
+           CANVAS CHISPAS SUAVES
+           ===================================================== */
+        #sparkles-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* =====================================================
+           PANTALLA PRINCIPAL
+           ===================================================== */
+        .welcome-screen {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            z-index: 10;
+            padding-bottom: clamp(22px, 5vh, 50px);
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        /* =====================================================
+           BLOQUE NOMBRE DEL INVITADO
+           ===================================================== */
+        .guest-info-block {
+            text-align: center;
+            animation: fadeUp 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.3s both;
+        }
+
+        .guest-welcome-label {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(0.6rem, 2vw, 0.8rem);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 3px;
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9);
+        }
+
+        .guest-name-display {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(1.6rem, 5vw, 2.8rem);
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            line-height: 1.1;
+            margin-bottom: 5px;
+            text-shadow:
+                0 0 18px rgba(255, 255, 255, 0.95),
+                0 2px 12px rgba(0, 0, 0, 0.95),
+                0 4px 25px rgba(0, 0, 0, 0.8);
+        }
+
+        .guest-meta-display {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(0.6rem, 1.8vw, 0.82rem);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.92);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+            margin-bottom: 16px;
+        }
+
+        /* ── BOTÓN ABRIR INVITACIÓN ── */
+        .open-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            font-family: 'Cinzel', serif;
+            font-size: clamp(0.58rem, 1.7vw, 0.72rem);
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #0d1b3e;
+            background: linear-gradient(135deg, #ffffff 0%, #f5e8d0 100%);
+            padding: 13px 34px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45), 0 0 0 2px rgba(255, 255, 255, 0.35);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            animation: fadeUp 1.5s cubic-bezier(0.25, 1, 0.5, 1) 0.6s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* brillo shimmer al hover */
+        .open-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .open-btn:hover::before {
+            left: 100%;
+        }
+
+        .open-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 14px 38px rgba(0, 0, 0, 0.55), 0 0 0 2px rgba(255, 255, 255, 0.55);
+        }
+
+        .open-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* =====================================================
+           OVERLAY DE TRANSICIÓN
+           ===================================================== */
+        #transition-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 5000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.7s ease;
+        }
+
+        /* =====================================================
+           CARTA QUE SALE DEL SOBRE
+           ===================================================== */
+
+        /* Contenedor del sobre que se sacude */
+        #envelope-anim {
+            position: fixed;
+            left: 50%;
+            /* Centrado verticalmente con un poco más arriba del centro
+               para dar sensación de que la carta viene desde el sobre en la imagen */
+            top: 52%;
+            transform: translate(-50%, -50%);
+            z-index: 3500;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* La carta de papel — posicionada con vh para salir 100% de pantalla */
+        #paper-letter {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+
+            width: min(320px, 82vw);
+            background: linear-gradient(160deg, #ffffff 0%, #fdf7ee 100%);
+            border-radius: 4px 4px 3px 3px;
+
+            box-shadow:
+                0 -4px 20px rgba(0, 0, 0, 0.25),
+                0 20px 60px rgba(0, 0, 0, 0.55);
+
+            z-index: 4000;
+            padding: 32px 26px 28px;
+            text-align: center;
+            pointer-events: none;
+            opacity: 0;
+
+            border: 1px solid rgba(13, 27, 62, 0.12);
+
+            clip-path: polygon(0% 6%, 50% 0%, 100% 6%, 100% 100%, 0% 100%);
+
+            transition:
+                opacity 1s ease,
+                transform 1s ease;
+        }
+
+        #paper-letter::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border: 1px solid rgba(13, 27, 62, 0.1);
+            border-radius: 3px;
+            pointer-events: none;
+        }
+
+        /* líneas decorativas en la carta */
+        .letter-deco {
+            width: 45px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #8B0000, transparent);
+            margin: 7px auto;
+        }
+
+        .letter-tag {
+            font-family: 'Cinzel', serif;
+            font-size: 0.5rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #8B0000;
+            margin-bottom: 3px;
+        }
+
+        .letter-couple-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(1.7rem, 5vw, 2.6rem);
+            color: #0d1b3e;
+            line-height: 1.15;
+        }
+
+        .letter-to {
+            font-family: 'Cinzel', serif;
+            font-size: 0.48rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 3px;
+        }
+
+        .letter-guest-name {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(0.9rem, 2.8vw, 1.3rem);
+            color: #0d1b3e;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* =====================================================
+           REPRODUCTOR MÚSICA
+           ===================================================== */
+        .music-player-container {
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(13, 27, 62, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(12px);
+            padding: 6px 12px;
+            border-radius: 50px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .music-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B0000, #c0392b);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: transform 0.2s ease;
+            box-shadow: 0 3px 10px rgba(139, 0, 0, 0.5);
+        }
+
+        .music-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .music-info {
+            font-family: 'Cinzel', serif;
+            font-size: 0.58rem;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .music-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 11px;
+        }
+
+        .music-bars span {
+            display: inline-block;
+            width: 2px;
+            background: #fff;
+            height: 100%;
+            animation: bounceBars 0.9s linear infinite alternate;
+            transform-origin: bottom;
+            animation-play-state: paused;
+        }
+
+        .music-bars.playing span {
+            animation-play-state: running;
+        }
+
+        .music-bars span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .music-bars span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* =====================================================
+           KEYFRAMES
+           ===================================================== */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(22px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounceBars {
+            0% {
+                transform: scaleY(0.15);
+            }
+
+            100% {
+                transform: scaleY(1);
+            }
+        }
+
+        @keyframes letterReveal {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* Sobre se sacude */
+        @keyframes envelopeShake {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg) scale(1);
+            }
+
+            15% {
+                transform: translate(-50%, -50%) rotate(-6deg) scale(1.04);
+            }
+
+            30% {
+                transform: translate(-50%, -50%) rotate(6deg) scale(1.04);
+            }
+
+            45% {
+                transform: translate(-50%, -50%) rotate(-3deg) scale(1.02);
+            }
+
+            60% {
+                transform: translate(-50%, -50%) rotate(3deg) scale(1.02);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(0deg) scale(1);
+            }
+        }
+
+        /* Carta sube con transition de top (en vh) y sale por arriba */
+        /* La animación real se hace por JS cambiando .style.top */
+
+        /* =====================================================
+           RESPONSIVO
+           ===================================================== */
+        @media (max-width: 480px) {
+            .guest-name-display {
+                font-size: 1.5rem;
+                letter-spacing: 1px;
+            }
+
+            .open-btn {
+                padding: 11px 26px;
+            }
+        }
+
+        @media (max-height: 640px) {
+            .welcome-screen {
+                padding-bottom: 14px;
+            }
+
+            .guest-meta-display {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== FONDO: imagen COMPLETA (object-fit: contain) ===== -->
+    <!-- Para cambiar la imagen: sube una en el panel de administrador -->
+    <div class="portada-bg">
+        <img src="{% if invitacion.fondo_portada_url %}/static/{{ invitacion.fondo_portada_url }}{% else %}/static/assets/portada-sobre-bg.png{% endif %}"
+            alt="Fondo sobre" class="portada-bg-img">
+    </div>
+
+    <!-- Canvas chispas -->
+    <canvas id="sparkles-canvas"></canvas>
+
+    <!-- Overlay negro de transición -->
+    <div id="transition-overlay"></div>
+
+    <!-- Carta que sube del sobre -->
+    <div id="paper-letter">
+        <div class="letter-tag">Invitación Especial</div>
+        <div class="letter-deco"></div>
+        <div class="letter-couple-name">{{ invitacion.titulo }}</div>
+        <div class="letter-deco"></div>
+        <div class="letter-to">Para</div>
+        <div class="letter-guest-name">{{ invitado.nombre }}</div>
+        <div class="letter-deco"></div>
+    </div>
+
+    <!-- Pantalla principal -->
+    <main class="welcome-screen">
+        <div class="guest-info-block" id="guest-block">
+            <p class="guest-welcome-label">Bienvenido(a)</p>
+            <p class="guest-name-display">{{ invitado.nombre }}</p>
+            <p class="guest-meta-display">
+                Mesa: {{ invitado.mesa }}&nbsp;&bull;&nbsp;Cupo: {{ invitado.cupos_asignados }}
+            </p>
+            <button class="open-btn" id="open-btn">
+                <i class="fas fa-envelope-open"></i>
+                Abrir Invitación
+            </button>
+        </div>
+    </main>
+
+    <script>
+        // ============================================================
+        // CHISPAS / PARTÍCULAS
+        // ============================================================
+        const canvas = document.getElementById('sparkles-canvas');
+        const ctx = canvas.getContext('2d');
+        let W, H, particles = [];
+
+        function resize() {
+            W = canvas.width = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', () => { resize(); initSparkles(); });
+        resize();
+
+        class Sparkle {
+            constructor() { this.reset(true); }
+            reset(rand = false) {
+                this.x = Math.random() * W;
+                this.y = rand ? Math.random() * H : H + 5;
+                this.r = Math.random() * 1.4 + 0.4;
+                this.vy = -(Math.random() * 0.55 + 0.15);
+                this.vx = Math.random() * 0.3 - 0.15;
+                this.op = Math.random() * 0.45 + 0.1;
+                this.tw = Math.random() * 0.011 + 0.003;
+                this.dir = 1;
+                this.isStar = Math.random() > 0.6;
+                this.gold = Math.random() > 0.59;
+            }
+            update() {
+                this.y += this.vy;
+                this.x += this.vx;
+                this.op += this.tw * this.dir;
+                if (this.op > 0.7 || this.op < 0.05) this.dir *= -1;
+                if (this.y < -5) this.reset();
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.op);
+                ctx.fillStyle = this.gold ? '#E8C96B' : '#ffffff';
+                ctx.shadowBlur = 3;
+                ctx.shadowColor = this.gold ? '#E8C96B' : '#fff';
+                if (this.isStar) {
+                    ctx.translate(this.x, this.y);
+                    const s = this.r * 1.8;
+                    ctx.beginPath();
+                    for (let i = 0; i < 8; i++) {
+                        const a = (i * Math.PI) / 4;
+                        const rad = i % 2 === 0 ? s * 1.8 : s * 0.6;
+                        i === 0
+                            ? ctx.moveTo(Math.cos(a) * rad, Math.sin(a) * rad)
+                            : ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                    }
+                    ctx.closePath();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                }
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function initSparkles() {
+            particles = [];
+            const n = Math.min(Math.floor((W * H) / 12000), 55);
+            for (let i = 0; i < n; i++) particles.push(new Sparkle());
+        }
+
+        (function animateSparkles() {
+            ctx.clearRect(0, 0, W, H);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateSparkles);
+        })();
+
+        initSparkles();
+
+        // ============================================================
+        // ANIMACIÓN: SOBRE SE SACUDE → CARTA SUBE → TRANSICIÓN
+        // ============================================================
+        const openBtn = document.getElementById('open-btn');
+        const guestBlock = document.getElementById('guest-block');
+        const letter = document.getElementById('paper-letter');
+        const overlay = document.getElementById('transition-overlay');
+        const destUrl = '/invitacion/{{ invitado.uuid }}/detalles?autoplay=1';
+
+        let opened = false;
+
+        function openInvitation() {
+            if (opened) return;
+            opened = true;
+
+            // Marcar que la música debe sonar al llegar a la invitación
+            localStorage.setItem('music_playing', 'true');
+
+            // 1. El fondo/sobre se queda quieto (se elimina la animación de sacudida)
+
+            // 2. Nombre + botón desaparecen
+            guestBlock.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+            guestBlock.style.opacity = '0';
+            guestBlock.style.transform = 'translateY(12px)';
+
+            // 3. Carta aparece y sube desde abajo hasta el centro
+            // 3. Carta aparece con animación elegante
+            // 3. Carta emerge desde el sobre
+
+            setTimeout(() => {
+
+                letter.style.animation = 'none';
+                void letter.offsetWidth;
+
+                letter.style.animation =
+                    'letterReveal 2s cubic-bezier(0.22, 1, 0.36, 1) forwards';
+
+            }, 380);
+
+            // 4. La carta desaparece suavemente
+            setTimeout(() => {
+                // Quitar la animación para que el transform manual funcione
+                letter.style.animation = 'none';
+                letter.style.opacity = '0';
+                letter.style.transform = 'translate(-50%, -50%) scale(1.1)';
+            }, 3500);
+
+            // 5. Fade a negro
+            setTimeout(() => {
+                overlay.style.pointerEvents = 'all';
+                overlay.style.opacity = '1';
+            }, 4400);
+
+            // 6. Ir a la invitación
+            setTimeout(() => {
+                window.location.href = destUrl;
+            }, 5000);
+        }
+
+        // El botón lanza la animación
+        openBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            openInvitation();
+        });
+
+        // Tocar cualquier parte también abre (excepto el reproductor)
+        document.addEventListener('click', e => {
+            if (e.target.closest('#music-player')) return;
+            if (!opened) openInvitation();
+        });
+
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js').catch(() => { });
+            });
+        }
+    </script>
+</body>
+
+</html>

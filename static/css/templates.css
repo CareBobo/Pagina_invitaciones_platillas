@@ -1,0 +1,225 @@
+/* ==========================================================================
+   SISTEMA DE PLANTILLAS PREMIUM - INVITACIONES DIGITALES
+   ========================================================================== */
+
+/* Importar tipografías refinadas desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Questrial&family=Rosario:wght@400;600&display=swap');
+
+/* --- 1. ELEGANCE GOLD (Dorado Refinado) --- */
+.theme-elegance-gold {
+    --bg-primary: #FAF6F0;
+    --bg-secondary: #1C1A17;
+    --text-primary: #2B2621;
+    --text-muted: #6E655F;
+    --accent-color: #D4AF37;
+    /* Oro clásico */
+    --accent-hover: #AA882C;
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --border-color: rgba(212, 175, 55, 0.3);
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Montserrat', sans-serif;
+    --font-script: 'Great Vibes', cursive;
+    --shadow-premium: 0 15px 35px rgba(212, 175, 55, 0.1);
+    --floral-accent: url('/static/assets/novios-silueta.png');
+    --bg-animation: linear-gradient(135deg, #FAF6F0 0%, #F5EDE0 100%);
+}
+
+/* --- 2. ROYAL LUXURY (Azul Real & Oro) --- */
+.theme-royal-luxury {
+    --bg-primary: #0F172A;
+    /* Azul Oscuro Premium */
+    --bg-secondary: #020617;
+    --text-primary: #F8FAFC;
+    --text-muted: #94A3B8;
+    --accent-color: #E2B96B;
+    /* Oro Imperial */
+    --accent-hover: #C69E52;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border-color: rgba(226, 185, 107, 0.35);
+    --font-heading: 'Cinzel', serif;
+    --font-body: 'Inter', sans-serif;
+    --font-script: 'Great Vibes', cursive;
+    --shadow-premium: 0 15px 40px rgba(0, 0, 0, 0.5);
+    --floral-accent: url('/static/assets/novios-silueta-gold.png');
+    --bg-animation: linear-gradient(135deg, #0F172A 0%, #020617 100%);
+}
+
+/* --- 3. TERRACOTA PREMIUM (Tonos Tierra & Pampas) --- */
+.theme-terracota-premium {
+    --bg-primary: #F7EFE9;
+    /* Arena suave */
+    --bg-secondary: #C47A6C;
+    /* Terracota */
+    --text-primary: #4A3E3D;
+    --text-muted: #7A6966;
+    --accent-color: #C47A6C;
+    /* Terracota */
+    --accent-hover: #A35E52;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --border-color: rgba(196, 122, 108, 0.25);
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Rosario', sans-serif;
+    --font-script: 'Dancing Script', cursive;
+    --shadow-premium: 0 15px 30px rgba(196, 122, 108, 0.1);
+    --floral-accent: url('/static/assets/pampas-terracota.png');
+    --bg-animation: linear-gradient(135deg, #F7EFE9 0%, #ECE1D7 100%);
+}
+
+/* --- 4. FLORAL GARDEN (Jardín de Flores & Rosas) --- */
+.theme-floral-garden {
+    --bg-primary: #FFFDFC;
+    --bg-secondary: #E9D2D4;
+    /* Rosa Garden */
+    --text-primary: #4F383B;
+    --text-muted: #7E6367;
+    --accent-color: #C28D91;
+    /* Rosa Viejo */
+    --accent-hover: #A67074;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --border-color: rgba(233, 210, 212, 0.4);
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Questrial', sans-serif;
+    --font-script: 'Great Vibes', cursive;
+    --shadow-premium: 0 15px 30px rgba(194, 141, 145, 0.12);
+    --floral-accent: url('/static/assets/floral-garden.png');
+    --bg-animation: linear-gradient(135deg, #FFFDFC 0%, #F8EEED 100%);
+}
+
+/* --- 5. MINIMAL WHITE (Negro & Blanco Nórdico) --- */
+.theme-minimal-white {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #111111;
+    --text-primary: #111111;
+    --text-muted: #767676;
+    --accent-color: #111111;
+    /* Negro absoluto */
+    --accent-hover: #444444;
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --border-color: rgba(17, 17, 17, 0.15);
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-script: 'Playfair Display', serif;
+    /* En minimalista se prefiere serif itálica */
+    --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --floral-accent: none;
+    --bg-animation: #FFFFFF;
+}
+
+/* ==========================================================================
+   CLASES COMPARTIDAS UTILIZADAS POR EL SISTEMA DE PLANTILLAS
+   ========================================================================== */
+
+body.theme-body {
+    background: var(--bg-animation);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Tipografías Dinámicas */
+.heading-theme {
+    font-family: var(--font-heading);
+    letter-spacing: 0.05em;
+}
+
+.script-theme {
+    font-family: var(--font-script);
+}
+
+.text-theme {
+    font-family: var(--font-body);
+}
+
+/* Elementos Dinámicos en las Invitaciones */
+.btn-theme {
+    background-color: var(--accent-color);
+    color: #ffffff !important;
+    font-family: var(--font-heading);
+    border: 1px solid var(--accent-color);
+    border-radius: 50px;
+    padding: 12px 30px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+.theme-royal-luxury .btn-theme {
+    color: var(--bg-secondary) !important;
+    font-weight: 600;
+}
+
+.btn-theme:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-theme {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-premium);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-theme:hover {
+    transform: translateY(-5px);
+}
+
+/* Decoraciones Florales que cambian de acuerdo a la plantilla */
+.floral-header {
+    background-image: var(--floral-accent);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100%;
+    height: 150px;
+    opacity: 0.95;
+}
+
+/* Impedir que la silueta de los novios se voltee verticalmente */
+.theme-elegance-gold .floral-header,
+.theme-royal-luxury .floral-header {
+    transform: none !important;
+}
+
+/* Hojas y Pétalos Flotantes (Partículas en Canvas o Divs) */
+.particle-leaf {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    opacity: 0.7;
+    z-index: 10;
+}
+
+.theme-elegance-gold .particle-leaf {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23D4AF37"><path d="M17 8C8 10 5.9 16.1 5.9 16.1S9.9 18 16 11.9c4.2-4.2 2-10.9 2-10.9s-6.8-1-11 3.2c-5.8 5.8-3.9 10.9-3.9 10.9s2.1-6 10-7.9c1.9-.4 3.9-.3 3.9-.3s-.1 2-2 3.2z"/></svg>');
+}
+
+.theme-royal-luxury .particle-leaf {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23E2B96B"><path d="M17 8C8 10 5.9 16.1 5.9 16.1S9.9 18 16 11.9c4.2-4.2 2-10.9 2-10.9s-6.8-1-11 3.2c-5.8 5.8-3.9 10.9-3.9 10.9s2.1-6 10-7.9c1.9-.4 3.9-.3 3.9-.3s-.1 2-2 3.2z"/></svg>');
+}
+
+.theme-terracota-premium .particle-leaf {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23C47A6C"><path d="M17 8C8 10 5.9 16.1 5.9 16.1S9.9 18 16 11.9c4.2-4.2 2-10.9 2-10.9s-6.8-1-11 3.2c-5.8 5.8-3.9 10.9-3.9 10.9s2.1-6 10-7.9c1.9-.4 3.9-.3 3.9-.3s-.1 2-2 3.2z"/></svg>');
+}
+
+.theme-floral-garden .particle-leaf {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23E9D2D4"><path d="M12 21a9 9 0 0 1 0-18c2.5 0 7 2 7 6s-2 12-7 12z"/></svg>');
+    /* Pétalo circular */
+}
+
+.theme-minimal-white .particle-leaf {
+    display: none;
+    /* No usar partículas flotantes en Minimal White */
+}

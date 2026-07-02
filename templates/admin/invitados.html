@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitados & RSVP - Momentos Digitales ⭐</title>
+    
+    <!-- CSS de Administración -->
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <!-- FontAwesome Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="admin-body">
+
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <aside class="admin-sidebar">
+        <a href="/admin/dashboard" class="sidebar-brand">
+            <i class="fas fa-envelope-open-text"></i>
+            <span>Momentos Digitales ⭐</span>
+        </a>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/admin/dashboard" class="sidebar-link">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/invitacion/{{ invitacion.id }}/editar" class="sidebar-link">
+                    <i class="fas fa-magic"></i>
+                    <span>Editar Invitación</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/invitacion/{{ invitacion.id }}/invitados" class="sidebar-link active">
+                    <i class="fas fa-users"></i>
+                    <span>Invitados & RSVP</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/invitacion/nueva" class="sidebar-link">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Nueva Invitación</span>
+                </a>
+            </li>
+            {% if usuario_actual.rol == 'SUPER_ADMIN' %}
+            <li style="margin-top: 15px; padding: 0 24px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-gray); letter-spacing: 1px;">
+                <span>Super Admin</span>
+            </li>
+            <li>
+                <a href="/admin/usuarios" class="sidebar-link">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Usuarios Admins</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/admin/logout" class="sidebar-link" style="color: #ef4444; border-left-color: #ef4444;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="admin-main">
+        <header class="admin-header">
+            <div class="admin-title-group">
+                <h1>Invitados de: {{ invitacion.titulo }}</h1>
+                <p>Gestiona, importa y descarga accesos y códigos QR individuales.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="/admin/invitacion/{{ invitacion.id }}/invitados/descargar-qrs" class="btn-admin outline">
+                    <i class="fas fa-file-archive"></i> Descargar ZIP QRs
+                </a>
+                <div style="position: relative; display: inline-block;">
+                    <button class="btn-admin outline" onclick="toggleExportMenu()" id="export-btn">
+                        <i class="fas fa-download"></i> Exportar Lista <i class="fas fa-chevron-down" style="font-size: 0.7rem; margin-left: 5px;"></i>
+                    </button>
+                    <div id="export-menu" style="display: none; position: absolute; right: 0; top: 45px; background: white; border: 1px solid var(--border-light); border-radius: 8px; box-shadow: var(--card-shadow); z-index: 10; width: 150px;">
+                        <a href="/admin/invitacion/{{ invitacion.id }}/exportar/xlsx" style="display: block; padding: 10px 15px; color: var(--text-dark); text-decoration: none; font-size: 0.85rem; font-weight: 500;" class="sidebar-link">Excel (XLSX)</a>
+                        <a href="/admin/invitacion/{{ invitacion.id }}/exportar/csv" style="display: block; padding: 10px 15px; color: var(--text-dark); text-decoration: none; font-size: 0.85rem; font-weight: 500;" class="sidebar-link">CSV</a>
+                        <a href="/admin/invitacion/{{ invitacion.id }}/exportar/pdf" style="display: block; padding: 10px 15px; color: var(--text-dark); text-decoration: none; font-size: 0.85rem; font-weight: 500;" class="sidebar-link">PDF</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Mensajes de Estado (Importaciones, errores) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="background-color: {% if category == 'success' %}#d1fae5{% else %}#fee2e2{% endif %}; 
+                                color: {% if category == 'success' %}#065f46{% else %}#991b1b{% endif %}; 
+                                padding: 15px; 
+                                border-radius: 8px; 
+                                font-size: 0.9rem; 
+                                font-weight: 500; 
+                                margin-bottom: 25px;">
+                        <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}" style="margin-right: 6px;"></i>
+                        {{ message|safe }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+            <!-- SECCIÓN IZQUIERDA: IMPORTADOR Y CREAR INVITADO -->
+            <div>
+                <!-- Importador Masivo -->
+                <div class="admin-card">
+                    <h3 style="margin-bottom: 15px; font-weight: 600;">Importación Masiva</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 20px;">
+                        Sube una plantilla Excel (XLSX, XLS) o CSV con las columnas: <br>
+                        <strong>Nombre, Mesa, Cupos, Teléfono, Correo</strong>
+                    </p>
+                    <form action="/admin/invitacion/{{ invitacion.id }}/invitados/importar" method="POST" enctype="multipart/form-data">
+                        <div class="dropzone-area" onclick="document.getElementById('import-file').click();">
+                            <i class="fas fa-file-excel dropzone-icon"></i>
+                            <p style="font-weight: 500; font-size: 0.9rem; margin-bottom: 5px;">Arrastra tu archivo aquí</p>
+                            <p style="font-size: 0.75rem; color: var(--text-gray);">o haz clic para buscarlo</p>
+                            <input type="file" id="import-file" name="file" accept=".xlsx, .xls, .csv" style="display: none;" onchange="this.form.submit()">
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Crear Invitado Individual -->
+                <div class="admin-card">
+                    <h3 style="margin-bottom: 15px; font-weight: 600;">Agregar Invitado</h3>
+                    <form action="/admin/invitacion/{{ invitacion.id }}/invitados/agregar" method="POST">
+                        <div class="admin-form-group">
+                            <label for="nombre">Nombre Completo</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Sra. Liseth López" required>
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="mesa">Mesa Asignada</label>
+                            <input type="text" id="mesa" name="mesa" placeholder="5">
+                        </div>
+                        <div class="admin-form-grid" style="grid-template-columns: 1fr 1fr;">
+                            <div class="admin-form-group">
+                                <label for="cupos">Cupos Asignados</label>
+                                <input type="number" id="cupos" name="cupos_asignados" value="2" min="1" required>
+                            </div>
+                            <div class="admin-form-group">
+                                <label for="telefono">Celular (WhatsApp)</label>
+                                <input type="text" id="telefono" name="telefono" placeholder="3001234567">
+                            </div>
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="correo">Correo Electrónico</label>
+                            <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.com">
+                        </div>
+                        <button type="submit" class="btn-admin primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+                            <i class="fas fa-plus"></i> Crear Invitado
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DERECHA: LISTA DE INVITADOS -->
+            <div class="admin-card" style="padding: 25px;">
+                <div class="card-header-flex">
+                    <h2>Lista de Invitados ({{ invitados|length }})</h2>
+                    <input type="text" id="search-input" placeholder="Buscar invitado..." style="padding: 8px 14px; border: 1px solid var(--border-light); border-radius: 8px; font-family: inherit; font-size: 0.9rem;" onkeyup="filterGuests()">
+                </div>
+
+                <div class="table-responsive" style="max-height: 700px; overflow-y: auto;">
+                    <table class="admin-table" id="guests-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre / Acceso</th>
+                                <th>Mesa</th>
+                                <th>Cupos</th>
+                                <th>RSVP</th>
+                                <th>Código QR</th>
+                                <th style="text-align: right;">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inv in invitados %}
+                            <tr class="guest-row">
+                                <td>
+                                    <div style="font-weight: 600;">{{ inv.nombre }}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-gray); display: flex; align-items: center; gap: 5px; margin-top: 4px;">
+                                        <i class="fas fa-link"></i> 
+                                        <a href="/invitacion/acceso/{{ inv.uuid }}" target="_blank" style="color: var(--primary-color); text-decoration: none;">Ver enlace</a>
+                                    </div>
+                                </td>
+                                <td>Mesa {{ inv.mesa }}</td>
+                                <td>{{ inv.cupos_confirmados }} / {{ inv.cupos_asignados }}</td>
+                                <td>
+                                    {% if inv.estado_rsvp == 'Confirmado' %}
+                                        <span class="badge success" title="Confirmó asistencia">Sí</span>
+                                    {% elif inv.estado_rsvp == 'Rechazado' %}
+                                        <span class="badge danger" title="Rechazó invitación">No</span>
+                                    {% else %}
+                                        <span class="badge warning" title="Pendiente de confirmación">Pendiente</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if inv.qr_path %}
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <a href="/static/{{ inv.qr_path }}" target="_blank">
+                                            <img src="/static/{{ inv.qr_path }}" style="width: 35px; height: 35px; border: 1px solid var(--border-light); border-radius: 4px;">
+                                        </a>
+                                        <a href="/static/{{ inv.qr_path }}" download="{{ inv.nombre|slugify }}_qr.png" class="btn-icon-only" title="Descargar QR">
+                                            <i class="fas fa-download" style="font-size: 0.8rem;"></i>
+                                        </a>
+                                    </div>
+                                    {% else %}
+                                    <span style="font-size: 0.8rem; color: var(--text-gray);">Sin QR</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: right;">
+                                    <a href="/admin/invitado/{{ inv.id }}/eliminar" class="btn-icon-only" style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.2);" title="Eliminar Invitado" onclick="return confirm('¿Estás seguro de eliminar a este invitado?')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 40px 0; color: var(--text-gray);">No hay invitados creados. ¡Agrega o importa algunos!</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Script de control visual y búsqueda rápida -->
+    <script>
+        function toggleExportMenu() {
+            const menu = document.getElementById('export-menu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Cerrar menú de exportación al hacer clic afuera
+        window.addEventListener('click', (e) => {
+            if (!document.getElementById('export-btn').contains(e.target)) {
+                document.getElementById('export-menu').style.display = 'none';
+            }
+        });
+
+        // Filtro de invitados dinámico en tiempo real
+        function filterGuests() {
+            const input = document.getElementById('search-input');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('guests-table');
+            const tr = table.getElementsByClassName('guest-row');
+
+            for (let i = 0; i < tr.length; i++) {
+                const tdName = tr[i].getElementsByTagName('td')[0];
+                const tdMesa = tr[i].getElementsByTagName('td')[1];
+                if (tdName) {
+                    const txtValue = tdName.textContent || tdName.innerText;
+                    const mesaValue = tdMesa.textContent || tdMesa.innerText;
+                    if (txtValue.toLowerCase().indexOf(filter) > -1 || mesaValue.toLowerCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

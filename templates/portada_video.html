@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Invitación - {{ invitacion.titulo }}</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        /* Contenedor del Video */
+        .video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        #bg-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Usar contain para no recortar el video, o cover si quieren pantalla completa */
+            background: #000;
+        }
+
+        /* Capa oscura inicial para que resalte el botón */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 5;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Botón Play */
+        .play-btn-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+        }
+
+        .play-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            color: #fff;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            font-size: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            margin: 0 auto 15px auto;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .play-text {
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+            text-transform: uppercase;
+        }
+
+        /* Texto de Invitado */
+        .guest-text-overlay {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+            width: 90%;
+            color: #fff;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.9);
+            animation: fadeInOut 2s infinite alternate;
+        }
+
+        .guest-text-overlay h2 {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(2rem, 5vw, 4rem);
+            color: #ffd700; /* Dorado para que resalte */
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        .guest-text-overlay p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        @keyframes fadeInOut {
+            from { opacity: 0.8; transform: translate(-50%, 0) scale(1); }
+            to { opacity: 1; transform: translate(-50%, -5px) scale(1.02); }
+        }
+
+        /* Transición a la página real */
+        #fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+            transition: opacity 1.5s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="video-container">
+        <!-- El video debe estar muteado inicialmente o no auto-reproducirse por políticas del navegador -->
+        <video id="bg-video" playsinline preload="auto">
+            {% if invitacion.fondo_portada_url %}
+            <source src="/static/{{ invitacion.fondo_portada_url }}" type="video/mp4">
+            {% else %}
+            <source src="/static/assets/video_champagne.mp4" type="video/mp4">
+            {% endif %}
+            Tu navegador no soporta videos.
+        </video>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="guest-text-overlay" id="guest-text">
+        <p>Estás Invitado(a)</p>
+        <h2>{{ invitado.nombre }}</h2>
+    </div>
+
+    <div class="play-btn-container" id="play-container">
+        <button class="play-btn" onclick="startVideo()">
+            <i class="fas fa-play" style="margin-left: 5px;"></i>
+        </button>
+        <div class="play-text">Ver Invitación</div>
+    </div>
+
+    <div id="fade-overlay"></div>
+
+    <script>
+        const video = document.getElementById('bg-video');
+        const playContainer = document.getElementById('play-container');
+        const overlay = document.getElementById('overlay');
+        const guestText = document.getElementById('guest-text');
+        const fadeOverlay = document.getElementById('fade-overlay');
+
+        function startVideo() {
+            // Ocultar botón de play, overlay oscuro y texto
+            playContainer.style.display = 'none';
+            guestText.style.display = 'none';
+            overlay.style.opacity = '0';
+            
+            // Reproducir video
+            video.play().catch(e => {
+                console.error("Error al reproducir el video:", e);
+                // Si falla por alguna razón, redirigir directamente
+                redirect();
+            });
+        }
+
+        // Cuando el video termina, redirigir
+        video.addEventListener('ended', () => {
+            redirect();
+        });
+
+        function redirect() {
+            fadeOverlay.style.opacity = '1';
+            setTimeout(() => {
+                window.location.href = '/invitacion/{{ invitado.uuid }}/detalles?autoplay=1';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
