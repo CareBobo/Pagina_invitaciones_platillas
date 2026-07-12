@@ -1,4 +1,4 @@
-﻿services:
+services:
   - type: web
     name: invitaciones-boda
     env: python
@@ -13,9 +13,9 @@
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
-      - key: FIREBASE_STORAGE_BUCKET
+      - key: SUPABASE_URL
         sync: false
-      - key: FIREBASE_CREDENTIALS_JSON
+      - key: SUPABASE_KEY
         sync: false
   
   - type: psql

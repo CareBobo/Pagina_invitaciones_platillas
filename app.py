@@ -15,9 +15,7 @@ from reportlab.lib import colors
 from config import Config
 from models import db, Usuario, Invitacion, CronogramaItem, Invitado, FotoGaleria, MusicaSugerida
 
-import json
-import firebase_admin
-from firebase_admin import credentials, storage
+from supabase import create_client, Client
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -25,20 +23,19 @@ app.config.from_object(Config)
 # Inicializar Base de Datos con la App
 db.init_app(app)
 
-# Inicializar Firebase
-firebase_cred_json = os.getenv('FIREBASE_CREDENTIALS_JSON')
-if firebase_cred_json:
+# Inicializar Supabase
+supabase: Client = None
+supabase_url = app.config.get('SUPABASE_URL')
+supabase_key = app.config.get('SUPABASE_KEY')
+
+if supabase_url and supabase_key:
     try:
-        cred_dict = json.loads(firebase_cred_json)
-        cred = credentials.Certificate(cred_dict)
-        firebase_admin.initialize_app(cred, {
-            'storageBucket': app.config.get('FIREBASE_STORAGE_BUCKET', '')
-        })
-        print("Firebase inicializado correctamente.")
+        supabase = create_client(supabase_url, supabase_key)
+        print("Supabase inicializado correctamente.")
     except Exception as e:
-        print(f"Error inicializando Firebase: {e}")
+        print(f"Error inicializando Supabase: {e}")
 else:
-    print("ADVERTENCIA: FIREBASE_CREDENTIALS_JSON no está configurado en el entorno.")
+    print("ADVERTENCIA: SUPABASE_URL o SUPABASE_KEY no están configurados.")
 
 # --- FILTROS PERSONALIZADOS JINJA2 ---
 @app.template_filter('slugify')
@@ -315,28 +312,32 @@ def eliminar_musica_sugerida(id):
 # ==========================================================================
 
 def save_media_file(file_obj, folder_name):
-    """Guarda archivos en Firebase Storage (si está configurado) o localmente de forma segura"""
+    """Guarda archivos en Supabase Storage (si está configurado) o localmente de forma segura"""
     if file_obj and file_obj.filename != '':
         filename = secure_filename(f"{uuid.uuid4().hex}_{file_obj.filename}")
         
-        if firebase_cred_json:
+        if supabase:
             try:
-                bucket = storage.bucket()
+                file_content = file_obj.read()
                 blob_path = f"media/{folder_name}/{filename}"
-                blob = bucket.blob(blob_path)
                 
-                blob.upload_from_file(file_obj, content_type=file_obj.content_type)
-                blob.make_public()
-                return blob.public_url
+                supabase.storage.from_("archivos").upload(
+                    path=blob_path,
+                    file=file_content,
+                    file_options={"content-type": file_obj.content_type}
+                )
+                
+                public_url = supabase.storage.from_("archivos").get_public_url(blob_path)
+                return public_url
             except Exception as e:
-                print(f"Error subiendo a Firebase: {e}")
-                # Fallback a local si falla Firebase
+                print(f"Error subiendo a Supabase: {e}")
+                # Fallback a local si falla Supabase
                 
         # Fallback local
         save_path = os.path.join(app.config['MEDIA_FOLDER'], folder_name)
         if not os.path.exists(save_path):
             os.makedirs(save_path)
-        # Si se intentó subir a Firebase, el puntero del archivo puede estar al final
+        # Si se intentó subir a Supabase, el puntero del archivo puede estar al final
         file_obj.seek(0)
         file_obj.save(os.path.join(save_path, filename))
         return f"uploads/media/{folder_name}/{filename}"

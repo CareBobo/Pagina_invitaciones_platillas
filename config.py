@@ -30,8 +30,9 @@ class Config:
         # Fallback local a SQLite para desarrollo y pruebas portátiles
         SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(BASE_DIR, 'invitaciones.db')}"
         
-    # Firebase Storage
-    FIREBASE_STORAGE_BUCKET = os.getenv('FIREBASE_STORAGE_BUCKET')
+    # Supabase Configuration (Base de datos y Storage)
+    SUPABASE_URL = os.getenv('SUPABASE_URL')
+    SUPABASE_KEY = os.getenv('SUPABASE_KEY')
         
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     

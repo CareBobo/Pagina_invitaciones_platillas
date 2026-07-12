@@ -121,24 +121,29 @@ class Invitado(db.Model):
         img = qr.make_image(fill_color="black", back_color="white")
         filename = f"{self.uuid}.png"
         
-        firebase_cred_json = os.getenv('FIREBASE_CREDENTIALS_JSON')
-        if firebase_cred_json:
+        supabase_url = os.getenv('SUPABASE_URL')
+        supabase_key = os.getenv('SUPABASE_KEY')
+        
+        if supabase_url and supabase_key:
             try:
-                from firebase_admin import storage
-                bucket = storage.bucket()
+                from supabase import create_client
+                supabase = create_client(supabase_url, supabase_key)
                 blob_path = f"media/qrs/{filename}"
-                blob = bucket.blob(blob_path)
                 
                 img_byte_arr = io.BytesIO()
                 img.save(img_byte_arr, format='PNG')
-                img_byte_arr.seek(0)
+                file_content = img_byte_arr.getvalue()
                 
-                blob.upload_from_file(img_byte_arr, content_type='image/png')
-                blob.make_public()
-                self.qr_path = blob.public_url
+                supabase.storage.from_("archivos").upload(
+                    path=blob_path,
+                    file=file_content,
+                    file_options={"content-type": "image/png"}
+                )
+                
+                self.qr_path = supabase.storage.from_("archivos").get_public_url(blob_path)
                 return
             except Exception as e:
-                print(f"Error subiendo QR a Firebase: {e}")
+                print(f"Error subiendo QR a Supabase: {e}")
                 
         # Fallback local
         qr_dir = current_app.config['QR_FOLDER']
