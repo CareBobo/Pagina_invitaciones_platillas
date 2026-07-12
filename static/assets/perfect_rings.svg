@@ -1,0 +1,18 @@
+<svg width="60" height="20" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f1d798" />
+      <stop offset="50%" stop-color="#b38536" />
+      <stop offset="100%" stop-color="#4a3411" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#000" flood-opacity="0.8" />
+    </filter>
+  </defs>
+  <!-- Metallic ring passing horizontally -->
+  <rect x="10" y="8" width="40" height="4" rx="2" fill="url(#gold)" filter="url(#shadow)" />
+  
+  <!-- Holes on pages -->
+  <ellipse cx="15" cy="10" rx="3" ry="5" fill="#000" opacity="0.6" />
+  <ellipse cx="45" cy="10" rx="3" ry="5" fill="#000" opacity="0.6" />
+</svg>

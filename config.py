@@ -10,19 +10,28 @@ class Config:
     # Llave secreta para cookies y sesiones
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev_secret_key_invitaciones_premium_2026')
     
-    # Base de datos: Intentar armar la URI de MySQL si las variables están presentes
+    # Base de datos: PostgreSQL en Render, MySQL o SQLite fallback
+    DATABASE_URL = os.getenv('DATABASE_URL')
     DB_USER = os.getenv('DB_USER')
     DB_PASSWORD = os.getenv('DB_PASSWORD')
     DB_HOST = os.getenv('DB_HOST', 'localhost')
     DB_PORT = os.getenv('DB_PORT', '3306')
     DB_NAME = os.getenv('DB_NAME')
     
-    if DB_USER and DB_NAME:
+    if DATABASE_URL:
+        # Render a veces usa postgres:// que es obsoleto en SQLAlchemy 1.4+
+        if DATABASE_URL.startswith("postgres://"):
+            DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    elif DB_USER and DB_NAME:
         # URI de conexión de MySQL usando PyMySQL
         SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
     else:
-        # Fallback local a SQLite para desarrollo y pruebas portátiles sin MySQL
+        # Fallback local a SQLite para desarrollo y pruebas portátiles
         SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(BASE_DIR, 'invitaciones.db')}"
+        
+    # Firebase Storage
+    FIREBASE_STORAGE_BUCKET = os.getenv('FIREBASE_STORAGE_BUCKET')
         
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     

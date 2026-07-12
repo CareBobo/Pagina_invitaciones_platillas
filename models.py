@@ -103,14 +103,10 @@ class Invitado(db.Model):
         import qrcode
         import os
         from flask import current_app
+        import io
         
         # URL de acceso seguro usando el UUID del invitado
         qr_url = f"{app_domain}/invitacion/acceso/{self.uuid}"
-        
-        # Crear directorio si no existe
-        qr_dir = current_app.config['QR_FOLDER']
-        if not os.path.exists(qr_dir):
-            os.makedirs(qr_dir)
             
         # Generar QR
         qr = qrcode.QRCode(
@@ -124,6 +120,31 @@ class Invitado(db.Model):
         
         img = qr.make_image(fill_color="black", back_color="white")
         filename = f"{self.uuid}.png"
+        
+        firebase_cred_json = os.getenv('FIREBASE_CREDENTIALS_JSON')
+        if firebase_cred_json:
+            try:
+                from firebase_admin import storage
+                bucket = storage.bucket()
+                blob_path = f"media/qrs/{filename}"
+                blob = bucket.blob(blob_path)
+                
+                img_byte_arr = io.BytesIO()
+                img.save(img_byte_arr, format='PNG')
+                img_byte_arr.seek(0)
+                
+                blob.upload_from_file(img_byte_arr, content_type='image/png')
+                blob.make_public()
+                self.qr_path = blob.public_url
+                return
+            except Exception as e:
+                print(f"Error subiendo QR a Firebase: {e}")
+                
+        # Fallback local
+        qr_dir = current_app.config['QR_FOLDER']
+        if not os.path.exists(qr_dir):
+            os.makedirs(qr_dir)
+            
         filepath = os.path.join(qr_dir, filename)
         img.save(filepath)
         

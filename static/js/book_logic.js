@@ -4,12 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const audio = document.getElementById('bg-music');
     const btnMusic = document.getElementById('music-toggle');
     const swipeHint = document.getElementById('swipe-hint');
-    
+
     // Elementos del Inventario
     const stickerInventory = document.getElementById('sticker-inventory');
     const toggleBtn = document.getElementById('toggle-inventory-btn');
     const closeBtn = document.getElementById('close-inventory-btn');
-    
+
     let isMusicPlaying = false;
     let musicStarted = false;
 
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initBook();
 
     // Toggle Inventario
-    if(toggleBtn && closeBtn) {
+    if (toggleBtn && closeBtn) {
         toggleBtn.addEventListener('click', () => {
             stickerInventory.style.display = 'flex';
             setTimeout(() => stickerInventory.classList.add('visible'), 50);
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initBook() {
-        if(window.pageFlip) return;
+        if (window.pageFlip) return;
         window.pageFlip = new St.PageFlip(flipBookElement, {
             width: pageW,
             height: pageH,
@@ -55,21 +55,21 @@ document.addEventListener('DOMContentLoaded', () => {
             drawShadow: true,
             showCover: true,
             usePortrait: isMobile,
-            mobileScrollSupport: false, 
+            mobileScrollSupport: false,
             maxShadowOpacity: 0.5,
             flippingTime: 1000
         });
 
         const pages = document.querySelectorAll('.page');
         window.pageFlip.loadFromHTML(pages);
-        
+
         // El libro empieza pequeño (cerrado)
         flipBookElement.classList.add('closed-scale-front');
         flipBookElement.style.display = 'block';
 
         // Ocultar swipeHint al tocar
         flipBookElement.addEventListener('pointerdown', () => {
-            if(swipeHint && !swipeHint.classList.contains('hidden')) {
+            if (swipeHint && !swipeHint.classList.contains('hidden')) {
                 swipeHint.classList.add('hidden');
                 setTimeout(() => swipeHint.style.display = 'none', 500);
             }
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Evento al pasar página para controlar el tamaño y música
         window.pageFlip.on('flip', (e) => {
             // Ocultar hint
-            if(swipeHint) {
+            if (swipeHint) {
                 swipeHint.classList.add('hidden');
                 setTimeout(() => swipeHint.style.display = 'none', 500);
             }
@@ -87,31 +87,43 @@ document.addEventListener('DOMContentLoaded', () => {
             flipBookElement.classList.remove('closed-scale-front', 'closed-scale-back');
 
             // Si está en la portada (página 0), centrar y achicar
-            if(e.data === 0) {
+            if (e.data === 0) {
                 flipBookElement.classList.add('closed-scale-front');
-            // Si está en la contraportada (libro totalmente cerrado al final)
+                // Si está en la contraportada (libro totalmente cerrado al final)
             } else if (e.data === totalPages - 1) {
                 flipBookElement.classList.add('closed-scale-back');
+
+                // Regresar a la portada sin hacer giros 3D extremos
+                setTimeout(() => {
+                    window.pageFlip.flip(0); // Ir a página 0
+                }, 1500);
             }
 
-            // Iniciar música en la primera interacción
+            // Iniciar música y video en la primera interacción
             if (!musicStarted && audio) {
                 audio.play().then(() => {
                     isMusicPlaying = true;
                     musicStarted = true;
-                    if(btnMusic) {
+                    if (btnMusic) {
                         btnMusic.style.display = 'flex';
                         btnMusic.innerHTML = '<i class="fas fa-volume-up"></i>';
                     }
                 }).catch(err => console.log("Autoplay bloqueado"));
+
+                const mainVideo = document.getElementById('main-video');
+                if (mainVideo) {
+                    mainVideo.muted = false; // desmutear para que se escuche bajito
+                    mainVideo.volume = 0.1; // Volumen bajito
+                    mainVideo.play().catch(e => console.log(e));
+                }
             }
         });
     }
 
     // Control manual de música
-    if(btnMusic && audio) {
+    if (btnMusic && audio) {
         btnMusic.addEventListener('click', () => {
-            if(audio.paused) {
+            if (audio.paused) {
                 audio.play();
                 btnMusic.innerHTML = '<i class="fas fa-volume-up"></i>';
             } else {
@@ -126,18 +138,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LIGHTBOX Y CONTROL DE VOLTEO DE PÁGINAS ---
     // Detener propagación en elementos interactivos para que stPageFlip no reaccione
     const stopPropagation = (e) => e.stopPropagation();
-    
+
     // Aplicar a todos los elementos interactivos actuales y futuros (delegación no, asignación directa)
     const blockFlipOnElements = () => {
         document.querySelectorAll('input, select, button, video, a, .zoomable, .content-box').forEach(el => {
             const events = ['pointerdown', 'pointerup', 'touchstart', 'touchend', 'mousedown', 'mouseup', 'click'];
             events.forEach(eventType => {
                 el.removeEventListener(eventType, stopPropagation);
-                el.addEventListener(eventType, stopPropagation, {passive: false});
+                el.addEventListener(eventType, stopPropagation, { passive: false });
             });
         });
     };
-    
+
     // Ejecutar inicial
     blockFlipOnElements();
 
@@ -146,10 +158,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const lightboxContent = document.getElementById('lightbox-content');
     const lightboxClose = document.getElementById('lightbox-close');
 
-    if(lightboxModal) {
+    if (lightboxModal) {
         lightboxClose.addEventListener('click', () => {
             lightboxModal.style.display = 'none';
             lightboxContent.innerHTML = ''; // Limpiar contenido para pausar video
+            const mainVideo = document.getElementById('main-video');
+            if (mainVideo) {
+                mainVideo.muted = false;
+                mainVideo.volume = 0.1;
+            }
         });
 
         // Cerrar al tocar fuera de la imagen
@@ -157,6 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target === lightboxModal) {
                 lightboxModal.style.display = 'none';
                 lightboxContent.innerHTML = '';
+                const mainVideo = document.getElementById('main-video');
+                if (mainVideo) {
+                    mainVideo.muted = false;
+                    mainVideo.volume = 0.1;
+                }
             }
         });
 
@@ -165,10 +187,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 e.stopPropagation();
                 lightboxModal.style.display = 'flex';
-                
-                if(el.tagName.toLowerCase() === 'img') {
+
+                if (el.tagName.toLowerCase() === 'img') {
                     lightboxContent.innerHTML = `<img src="${el.src}" style="max-width: 100%; max-height: 85vh; border: 4px solid #d4af37; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); object-fit: contain;">`;
-                } else if(el.tagName.toLowerCase() === 'video') {
+                } else if (el.tagName.toLowerCase() === 'video') {
+                    if (el.id === 'main-video') el.volume = 0; // mutear el pequeño
                     lightboxContent.innerHTML = `<video src="${el.src}" controls autoplay playsinline style="max-width: 100%; max-height: 85vh; border: 4px solid #d4af37; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); object-fit: contain;"></video>`;
                 }
             });

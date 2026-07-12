@@ -15,11 +15,30 @@ from reportlab.lib import colors
 from config import Config
 from models import db, Usuario, Invitacion, CronogramaItem, Invitado, FotoGaleria, MusicaSugerida
 
+import json
+import firebase_admin
+from firebase_admin import credentials, storage
+
 app = Flask(__name__)
 app.config.from_object(Config)
 
 # Inicializar Base de Datos con la App
 db.init_app(app)
+
+# Inicializar Firebase
+firebase_cred_json = os.getenv('FIREBASE_CREDENTIALS_JSON')
+if firebase_cred_json:
+    try:
+        cred_dict = json.loads(firebase_cred_json)
+        cred = credentials.Certificate(cred_dict)
+        firebase_admin.initialize_app(cred, {
+            'storageBucket': app.config.get('FIREBASE_STORAGE_BUCKET', '')
+        })
+        print("Firebase inicializado correctamente.")
+    except Exception as e:
+        print(f"Error inicializando Firebase: {e}")
+else:
+    print("ADVERTENCIA: FIREBASE_CREDENTIALS_JSON no está configurado en el entorno.")
 
 # --- FILTROS PERSONALIZADOS JINJA2 ---
 @app.template_filter('slugify')
@@ -27,6 +46,15 @@ def slugify_filter(value):
     """Convierte texto en un slug amigable para nombres de archivos"""
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
     return re.sub(r'[-\s]+', '-', value)
+
+@app.template_filter('media_url')
+def media_url_filter(value):
+    """Si es URL de Firebase (http) la retorna tal cual, sino le agrega /static/"""
+    if not value:
+        return ""
+    if value.startswith('http'):
+        return value
+    return f"/static/{value}"
 
 # Inyectar variables globales en las plantillas Jinja2
 @app.context_processor
@@ -64,7 +92,7 @@ def acceso_portada(uuid_invitado):
     invitacion = db.session.get(Invitacion, invitado.invitacion_id)
     
     # Limpieza dinámica de archivos vacíos para el fallback
-    if invitacion.musica_url:
+    if invitacion.musica_url and not invitacion.musica_url.startswith('http'):
         full_path = os.path.join(app.root_path, 'static', invitacion.musica_url)
         if not os.path.exists(full_path) or os.path.getsize(full_path) == 0:
             invitacion.musica_url = None
@@ -90,12 +118,12 @@ def acceso_invitacion(uuid_invitado):
     invitacion = db.session.get(Invitacion, invitado.invitacion_id)
     
     # Limpieza dinámica de archivos vacíos para el fallback
-    if invitacion.video_url:
+    if invitacion.video_url and not invitacion.video_url.startswith('http'):
         full_path = os.path.join(app.root_path, 'static', invitacion.video_url)
         if not os.path.exists(full_path) or os.path.getsize(full_path) == 0:
             invitacion.video_url = None
             
-    if invitacion.musica_url:
+    if invitacion.musica_url and not invitacion.musica_url.startswith('http'):
         full_path = os.path.join(app.root_path, 'static', invitacion.musica_url)
         if not os.path.exists(full_path) or os.path.getsize(full_path) == 0:
             invitacion.musica_url = None
@@ -287,12 +315,29 @@ def eliminar_musica_sugerida(id):
 # ==========================================================================
 
 def save_media_file(file_obj, folder_name):
-    """Guarda archivos de video, fotos o música de forma segura"""
+    """Guarda archivos en Firebase Storage (si está configurado) o localmente de forma segura"""
     if file_obj and file_obj.filename != '':
         filename = secure_filename(f"{uuid.uuid4().hex}_{file_obj.filename}")
+        
+        if firebase_cred_json:
+            try:
+                bucket = storage.bucket()
+                blob_path = f"media/{folder_name}/{filename}"
+                blob = bucket.blob(blob_path)
+                
+                blob.upload_from_file(file_obj, content_type=file_obj.content_type)
+                blob.make_public()
+                return blob.public_url
+            except Exception as e:
+                print(f"Error subiendo a Firebase: {e}")
+                # Fallback a local si falla Firebase
+                
+        # Fallback local
         save_path = os.path.join(app.config['MEDIA_FOLDER'], folder_name)
         if not os.path.exists(save_path):
             os.makedirs(save_path)
+        # Si se intentó subir a Firebase, el puntero del archivo puede estar al final
+        file_obj.seek(0)
         file_obj.save(os.path.join(save_path, filename))
         return f"uploads/media/{folder_name}/{filename}"
     return None
