@@ -2,6 +2,7 @@ services:
   - type: web
     name: invitaciones-boda
     env: python
+    plan: free
     buildCommand: "pip install -r requirements.txt"
     preDeployCommand: "python -c 'from app import app, db, init_db_seeds; init_db_seeds()'"
     startCommand: "gunicorn app:app"
