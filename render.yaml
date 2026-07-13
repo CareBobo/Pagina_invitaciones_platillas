@@ -3,6 +3,7 @@ services:
     name: invitaciones-boda
     env: python
     buildCommand: "pip install -r requirements.txt"
+    releaseCommand: "python -c 'from app import app, db, init_db_seeds; init_db_seeds()'"
     startCommand: "gunicorn app:app"
     envVars:
       - key: PYTHON_VERSION

@@ -1,0 +1,28 @@
+# Cache y archivos temporales de Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Entornos virtuales
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Base de datos local SQLite
+invitaciones.db
+invitaciones.db-journal
+
+# Archivos de configuración de editores/IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Archivos cargados localmente (uploads y QRs)
+static/uploads/
