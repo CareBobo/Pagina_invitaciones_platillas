@@ -18,7 +18,6 @@ services:
         sync: false
       - key: SUPABASE_KEY
         sync: false
-  
-  - type: postgres
-    name: invitaciones-db
+databases:
+  - name: invitaciones-db
     plan: free
