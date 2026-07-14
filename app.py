@@ -79,6 +79,11 @@ def login_required(f):
 # RUTAS PÚBLICAS DE INVITADOS (ACCESO VÍA UUID)
 # ==========================================================================
 
+@app.route('/')
+def index():
+    return redirect(url_for('admin_login'))
+
+
 @app.route('/invitacion/acceso/<uuid_invitado>')
 def acceso_portada(uuid_invitado):
     """Visualización de la Portada (Página 1) personalizada por UUID del invitado"""
