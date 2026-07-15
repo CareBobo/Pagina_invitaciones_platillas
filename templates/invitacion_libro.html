@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>{{ invitacion.titulo }} - Libro MÃ¡gico</title>
+    <title>{{ invitacion.titulo }} - Libro Mágico</title>
 
     <link rel="stylesheet" href="/static/css/book_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,7 +13,7 @@
         rel="stylesheet">
 
     <style>
-        /* Estilos dinÃ¡micos inyectados desde Python */
+        /* Estilos dinámicos inyectados desde Python */
         .floral-bg {
                 {
                 % if invitacion.decoracion_bordes_url %
@@ -50,7 +50,7 @@
 <body
     style="background-image: url('/static/assets/fondo_patio.jpg'); background-size: cover; background-position: center; background-attachment: fixed; margin: 0; overflow: hidden; perspective: 1200px;">
 
-    <!-- Aviso para forzar rotaciÃ³n en celulares -->
+    <!-- Aviso para forzar rotación en celulares -->
     <div id="rotate-warning">
         <i class="fas fa-mobile-alt rotate-icon"></i>
         <p>Por favor, gira tu celular en modo horizontal para vivir la experiencia completa.</p>
@@ -173,13 +173,13 @@
                     style="cursor: pointer; border: 2px solid #b38566; border-radius: 10px; padding: 15px; background: rgba(38,31,26,0.9); transition: transform 0.2s; box-shadow: -2px 3px 5px rgba(0,0,0,0.5);">
                     <i class="fas fa-map-marker-alt"
                         style="font-size: 2rem; color: #b38566; margin-bottom: 10px; text-shadow: 1px 1px 2px #000;"></i><br><b
-                        style="color: #e6d3ba;">UbicaciÃ³n</b>
+                        style="color: #e6d3ba;">Ubicación</b>
                 </div>
                 <div class="index-item" onclick="goToPage(6)"
                     style="cursor: pointer; border: 2px solid #b38566; border-radius: 10px; padding: 15px; background: rgba(38,31,26,0.9); transition: transform 0.2s; box-shadow: -2px 3px 5px rgba(0,0,0,0.5);">
                     <i class="fas fa-images"
                         style="font-size: 2rem; color: #b38566; margin-bottom: 10px; text-shadow: 1px 1px 2px #000;"></i><br><b
-                        style="color: #e6d3ba;">GalerÃ­a</b>
+                        style="color: #e6d3ba;">Galería</b>
                 </div>
                 <div class="index-item" onclick="goToPage(7)"
                     style="cursor: pointer; border: 2px solid #b38566; border-radius: 10px; padding: 15px; background: rgba(38,31,26,0.9); transition: transform 0.2s; box-shadow: -2px 3px 5px rgba(0,0,0,0.5);">
@@ -197,7 +197,7 @@
                     style="cursor: pointer; border: 2px solid #b38566; border-radius: 10px; padding: 15px; background: rgba(38,31,26,0.9); transition: transform 0.2s; box-shadow: -2px 3px 5px rgba(0,0,0,0.5);">
                     <i class="fas fa-music"
                         style="font-size: 2rem; color: #b38566; margin-bottom: 10px; text-shadow: 1px 1px 2px #000;"></i><br><b
-                        style="color: #e6d3ba;">MÃºsica</b>
+                        style="color: #e6d3ba;">Música</b>
                 </div>
                 <div class="index-item" onclick="goToPage(10)"
                     style="cursor: pointer; border: 2px solid #b38566; border-radius: 10px; padding: 15px; background: rgba(38,31,26,0.9); transition: transform 0.2s; box-shadow: -2px 3px 5px rgba(0,0,0,0.5);">
@@ -254,7 +254,7 @@
             style="transform: rotateX(5deg) scale(1.0); transition: transform 0.5s ease; border-radius: 5px; margin-bottom: 30px;">
             <div class="flip-book" id="flip-book">
 
-                <!-- PORTADA (PÃ¡gina 0) -->
+                <!-- PORTADA (Página 0) -->
                 <div class="page page-cover page-cover-top" data-density="hard">
                     <div class="page-content center-content romantic-cover"
                         style="background-image: url('/static/assets/portada_libro.jpg') !important; background-size: 100% 100% !important; background-position: center !important; background-repeat: no-repeat !important; border: none !important; align-items: center; justify-content: flex-start; padding-top: 15%;">
@@ -399,12 +399,12 @@
                                 </style>
                                 <div class="text-gradient-black"
                                     style="animation: scrollTextUp 15s linear infinite; text-align: center; font-family: 'Times New Roman', serif; font-size: 0.60rem; line-height: 1.4; padding: 5px;">
-                                    Nuestra historia comenzÃ³<br>
+                                    Nuestra historia comenzó<br>
                                     con una mirada,<br>
                                     y hoy se convierte<br>
                                     en una promesa eterna.<br>
                                     Gracias por<br>
-                                    acompaÃ±arnos en<br>
+                                    acompañarnos en<br>
                                     esta aventura.
                                 </div>
                             </div>
@@ -436,13 +436,13 @@
 
                         <div class="countdown-container"
                             style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px 29px; z-index: 5; margin-left: 5px; margin-top: -10px;">
-                            <!-- DÃ­as -->
+                            <!-- Días -->
                             <div
                                 style="background: transparent; width: 90px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; margin-top: 15px;">
                                 <span id="cd-days"
                                     style="color: #452d1f; font-family: 'Times New Roman', serif; font-size: 3rem; font-weight: bold; line-height: 1; text-shadow: 1px 1px 2px rgba(255,255,255,0.6);">00</span>
                                 <small
-                                    style="color: #452d1f; font-family: 'Great Vibes', cursive; font-size: 1.4rem; margin-top: 2px; text-shadow: 1px 1px 2px rgba(255,255,255,0.6);">DÃ­as</small>
+                                    style="color: #452d1f; font-family: 'Great Vibes', cursive; font-size: 1.4rem; margin-top: 2px; text-shadow: 1px 1px 2px rgba(255,255,255,0.6);">Días</small>
                             </div>
                             <!-- Horas -->
                             <div
@@ -536,10 +536,10 @@
                                     <i class="fas fa-glass-cheers"
                                         style="color: #d4af37; font-size: 1.5rem; margin-top: 8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);"></i>
                                     {% elif 'fiesta' in t_lower or 'baile' in t_lower or 'recepcion' in t_lower or
-                                    'mÃºsica' in t_lower or 'musica' in t_lower %}
+                                    'música' in t_lower or 'musica' in t_lower %}
                                     <i class="fas fa-music"
                                         style="color: #d4af37; font-size: 1.5rem; margin-top: 8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);"></i>
-                                    {% elif 'fotos' in t_lower or 'sesiÃ³n' in t_lower %}
+                                    {% elif 'fotos' in t_lower or 'sesión' in t_lower %}
                                     <i class="fas fa-camera"
                                         style="color: #d4af37; font-size: 1.5rem; margin-top: 8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);"></i>
                                     {% else %}
@@ -551,7 +551,7 @@
                                 {% else %}
                                 <p style="color: #e6d3ba; text-align: center; font-style: italic; margin-top: 50px;">
                                     Pronto
-                                    aÃ±adiremos el cronograma del evento.</p>
+                                    añadiremos el cronograma del evento.</p>
                                 {% endif %}
                             </div>
                         </div>
@@ -559,14 +559,14 @@
                     </div>
                 </div>
 
-                <!-- PÃGINA 5: UBICACIÃ“N -->
+                <!-- PÃGINA 5: UBICACIÓN -->
                 <div class="page">
                     <div class="page-content"
                         style="background: url('/static/assets/fondo_ubicacion_galeria.jpg') left center / 200% 100% no-repeat !important; padding: 20px; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; position: relative;">
 
                         <h3 class="title-distort"
                             style="font-family: 'Great Vibes', cursive; font-size: 3.5rem; color: #ffffff; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); margin-top: 10%; margin-bottom: 25px; line-height: 1; text-align: center; font-weight: normal; display: inline-block;">
-                            UbicaciÃ³n</h3>
+                            Ubicación</h3>
 
                         <div
                             style="width: 80%; flex-grow: 1; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; position: relative;">
@@ -604,7 +604,7 @@
 
                         <h3 class="title-shine"
                             style="font-family: 'Great Vibes', cursive; font-size: 3.5rem; color: #ffffff; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); margin-top: 10%; margin-bottom: 20px; line-height: 1; text-align: center; font-weight: normal; z-index: 5;">
-                            GalerÃ­a</h3>
+                            Galería</h3>
 
                         <!-- Contenedor absoluto para encajar las fotos exactamente en los marcos del fondo -->
                         {% if invitacion.fotos and invitacion.fotos|length >= 4 %}
@@ -631,7 +631,7 @@
                         {% else %}
                         <div
                             style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ffffff; text-align: center; font-style: italic; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); z-index: 5; width: 80%;">
-                            Sube al menos 4 fotos a la galerÃ­a para ver el collage.</div>
+                            Sube al menos 4 fotos a la galería para ver el collage.</div>
                         {% endif %}
                     </div>
                 </div>
@@ -652,7 +652,7 @@
                         <div style="text-align: center; margin-bottom: 80px; z-index: 5; margin-left: -15px;">
                             <h3 class="title-move"
                                 style="font-family: 'Great Vibes', cursive; font-size: 3.2rem; color: #ffffff; text-shadow: 2px 2px 8px rgba(0,0,0,0.6); margin: 0; line-height: 0.8; font-weight: normal; display: inline-block; ">
-                                CÃ³digo de</h3>
+                                Código de</h3>
                             <br>
                             <h3 class="title-move"
                                 style="font-family: 'Great Vibes', cursive; font-size: 2.5rem; color: #ffffff; text-shadow: 2px 2px 8px rgba(0,0,0,0.6); margin: 0; line-height: 1; font-weight: normal; display: inline-block;">
@@ -713,7 +713,7 @@
                     </div>
                 </div>
 
-                <!-- PÃGINA 9: MÃšSICA (NUEVO) -->
+                <!-- PÃGINA 9: MÚSICA (NUEVO) -->
                 <div class="page">
                     <div class="page-content"
                         style="background: url('/static/assets/fondo_musica_instagram.jpg') left center / 200% 100% no-repeat !important; padding: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
@@ -728,23 +728,23 @@
 
                         <h3 class="title-pulse"
                             style="font-family: 'Great Vibes', cursive; font-size: 2.8rem; color: #ffffff; text-shadow: 2px 2px 8px rgba(0,0,0,0.6); margin-bottom: 25px; line-height: 1; text-align: center; font-weight: normal; display: inline-block; z-index: 5; margin-top: -40px;">
-                            MÃºsica</h3>
+                            Música</h3>
 
                         <!-- Panel 3D -->
                         <div class="musica-text-container"
                             style="width: 85%; background: transparent; text-align: center; display: flex; flex-direction: column; align-items: center; z-index: 5; margin-top: 50px; position: relative; top: 45px; left: 15px;">
                             <h4
                                 style="color: #fff; font-family: 'Times New Roman', serif; font-size: 1.1rem; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 1px; line-height: 1.3; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
-                                Â¡AyÃºdanos a que nuestra boda sea inolvidable!</h4>
+                                Â¡Ayúdanos a que nuestra boda sea inolvidable!</h4>
                             <p
                                 style="color: #e6d3ba; font-family: 'Times New Roman', serif; font-size: 0.95rem; margin: 0 0 20px 0; font-style: italic; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">
-                                Agrega la mÃºsica que deseas escuchar dando clic en el botÃ³n.</p>
+                                Agrega la música que deseas escuchar dando clic en el botón.</p>
 
-                            <a href="https://wa.me/{{ invitacion.whatsapp_confirmacion }}?text=Â¡Hola!%20Me%20encantarÃ­a%20escuchar%20esta%20canciÃ³n%20en%20la%20boda:%20"
+                            <a href="https://wa.me/{{ invitacion.whatsapp_confirmacion }}?text=Â¡Hola!%20Me%20encantaría%20escuchar%20esta%20canción%20en%20la%20boda:%20"
                                 target="_blank"
                                 style="display: inline-block; background: linear-gradient(to bottom, #25D366, #128C7E); color: #fff; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-family: 'Montserrat', sans-serif; font-size: 0.70rem; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.6), inset 0 2px 2px rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; transition: transform 0.2s; width: 80%; box-sizing: border-box;"><i
                                     class="fab fa-whatsapp" style="font-size: 0.9rem; margin-right: 5px;"></i> Sugerir
-                                CanciÃ³n</a>
+                                Canción</a>
                         </div>
                     </div>
                 </div>
@@ -827,8 +827,8 @@
                                         style="display: none; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">.</label>
                                     <select name="estado_rsvp" required
                                         style="position: relative; top: -3px; left: 23px; width: 70%; padding: 7px; border-radius: 5px; border: none; background: #443232; color: #fff; font-family: 'Times New Roman', serif; font-size: 0.9rem; box-sizing: border-box; display: block;">
-                                        <option value="Confirmado">SÃ­, asistirÃ©</option>
-                                        <option value="Rechazado">No podrÃ© asistir</option>
+                                        <option value="Confirmado">Sí, asistiré</option>
+                                        <option value="Rechazado">No podré asistir</option>
                                     </select>
                                 </div>
                                 <button type="submit"
@@ -861,7 +861,7 @@
 
                             <h3 class="text-gradient-black"
                                 style="font-family: 'Times New Roman', serif; font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">
-                                Agradecemos tu cariÃ±o</h3>
+                                Agradecemos tu cariño</h3>
 
                             <div
                                 style="height: 200px; width: 100%; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);">
@@ -903,20 +903,20 @@
 
         <!-- CONTROLES DEBAJO DEL LIBRO -->
         <div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px; z-index: 100;">
-            <!-- IndicaciÃ³n de cÃ³mo abrir el libro -->
+            <!-- Indicación de cómo abrir el libro -->
             <p
                 style="color: #0e0d0d; font-family: 'Monotype Corsiva'; font-size: 2.1rem; margin-bottom: 25px; font-weight: 900; background: rgba(10, 10, 10, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 12px 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(212,175,55,0.4); letter-spacing: 1px; animation: pulse 2s infinite;">
                 <i class="fas fa-hand-pointer" style="color: #d4af37; text-shadow: 0 0 10px rgba(212,175,55,0.8);"></i>
                 Toca una esquina del libro para abrirlo
             </p>
 
-            <!-- BOTÃ“N DE ÃNDICE -->
+            <!-- BOTÓN DE ÃNDICE -->
             <button id="btn-index-bottom"
                 style="font-family: 'Bernard MT Condensed'; font-size: 1.2rem; padding: 15px 45px; border-radius: 50px; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; color: #0a0a0a; background: linear-gradient(135deg, rgba(20,20,20,0.6), rgba(0,0,0,0.3)); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(212,175,55,0.5); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(212,175,55,0.2), 0 0 20px rgba(212,175,55,0.4); font-weight: 600; transition: all 0.3s ease; text-shadow: 0 0 8px rgba(255,255,255,0.6);"
                 onmouseover="this.style.boxShadow='0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(212,175,55,0.4), 0 0 35px rgba(212,175,55,0.9)'; this.style.transform='scale(1.05)';"
                 onmouseout="this.style.boxShadow='0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(212,175,55,0.2), 0 0 20px rgba(212,175,55,0.4)'; this.style.transform='scale(1)';">
                 <i class="fas fa-layer-group"
-                    style="color: #d4af37; margin-right: 8px; text-shadow: 0 0 10px #d4af37;"></i> MENÃš DEL LIBRO
+                    style="color: #d4af37; margin-right: 8px; text-shadow: 0 0 10px #d4af37;"></i> MENÚ DEL LIBRO
             </button>
         </div>
     </div>
@@ -928,7 +928,7 @@
             style="position: absolute; top: 20px; right: 30px; color: white; font-size: 3rem; cursor: pointer; text-shadow: 0 0 10px rgba(0,0,0,0.5);">&times;</span>
         <div id="lightbox-content"
             style="max-width: 95%; max-height: 90%; display: flex; justify-content: center; align-items: center;">
-            <!-- Contenido dinÃ¡mico (img o video) -->
+            <!-- Contenido dinámico (img o video) -->
         </div>
     </div>
 
@@ -938,7 +938,7 @@
         });
     </script>
     <style>
-        /* Animaciones para los tÃ­tulos */
+        /* Animaciones para los títulos */
         @keyframes dance {
 
             0%,
@@ -1034,7 +1034,7 @@
     </style>
     <!-- stPageFlip Library CDN -->
     <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.min.js"></script>
-    <!-- Incluir Draggabilly o implementarlo en Vanilla JS. Haremos Vanilla JS para no depender de librerÃ­as extras -->
+    <!-- Incluir Draggabilly o implementarlo en Vanilla JS. Haremos Vanilla JS para no depender de librerías extras -->
 
     <!-- Modal de Video en Grande -->
     <div id="videoModalFullscreen"
@@ -1052,7 +1052,7 @@
             modal.style.display = 'flex';
             video.play();
 
-            // Bajar el volumen de la mÃºsica de fondo
+            // Bajar el volumen de la música de fondo
             var bgMusic = document.getElementById('bg-music');
             if (bgMusic) {
                 bgMusic.dataset.originalVolume = bgMusic.volume;
@@ -1065,13 +1065,13 @@
             modal.style.display = 'none';
             video.pause();
 
-            // Restaurar el volumen de la mÃºsica de fondo
+            // Restaurar el volumen de la música de fondo
             var bgMusic = document.getElementById('bg-music');
             if (bgMusic) {
                 bgMusic.volume = bgMusic.dataset.originalVolume ? parseFloat(bgMusic.dataset.originalVolume) : 1.0;
             }
 
-            // Pausar tambiÃ©n el video principal que estÃ¡ en el libro si estaba sonando
+            // Pausar también el video principal que está en el libro si estaba sonando
             var mainVideo = document.getElementById('main-video');
             if (mainVideo) {
                 mainVideo.pause();
@@ -1079,7 +1079,7 @@
         }
     </script>
 
-    <!-- AnimaciÃ³n de Cupido -->
+    <!-- Animación de Cupido -->
     <div id="cupid-container"
         style="position: fixed; top: 20%; left: -200px; z-index: 999999; pointer-events: none; opacity: 0; transition: opacity 0.5s; display: flex; align-items: center; transform: scaleX(-1);">
         <svg viewBox="0 0 100 100" width="160" height="160"
@@ -1230,7 +1230,7 @@
                 const cupidContainer = document.getElementById('cupid-container');
                 if (!cupidContainer) return;
 
-                // Variar la posiciÃ³n Y inicial (entre 10% y 75%)
+                // Variar la posición Y inicial (entre 10% y 75%)
                 const randomY = Math.floor(Math.random() * 65) + 10;
                 cupidContainer.style.top = randomY + '%';
 
@@ -1238,7 +1238,7 @@
                 cupidContainer.classList.add('cupid-fly-in');
 
                 // Calculamos coordenadas para apuntar (solo rotamos el contenedor un poco si queremos, pero mejor disparamos los corazones directo)
-                const startX = window.innerWidth * 0.10 + 100; // aprox posiciÃ³n del arco
+                const startX = window.innerWidth * 0.10 + 100; // aprox posición del arco
                 const startYPx = window.innerHeight * (randomY / 100) + 60;
                 const targetX = window.innerWidth * 0.5;
                 const targetY = window.innerHeight * 0.5;
@@ -1246,10 +1246,10 @@
                 const angle = Math.atan2(targetY - startYPx, targetX - startX) * 180 / Math.PI;
 
                 setTimeout(() => {
-                    // Disparar una rÃ¡faga de corazones
+                    // Disparar una ráfaga de corazones
                     shootHearts(startX, startYPx, targetX, targetY, angle);
 
-                    // Salir despuÃ©s de disparar
+                    // Salir después de disparar
                     setTimeout(() => {
                         cupidContainer.classList.remove('cupid-fly-in');
                         cupidContainer.classList.add('cupid-fly-out');
@@ -1265,11 +1265,11 @@
                         heart.innerHTML = 'â¤ï¸';
                         heart.className = 'heart-arrow-anim';
 
-                        // Agregar dispersiÃ³n al Ã¡ngulo para que los corazones salgan como escopeta/rÃ¡faga
+                        // Agregar dispersión al ángulo para que los corazones salgan como escopeta/ráfaga
                         const angleOffset = (Math.random() * 30 - 15);
                         const angle = baseAngle + angleOffset;
 
-                        // AÃ±adir un poco de aleatoriedad al objetivo para que impacten en distintas partes del libro
+                        // Añadir un poco de aleatoriedad al objetivo para que impacten en distintas partes del libro
                         const finalTargetX = targetX + (Math.random() * 100 - 50);
                         const finalTargetY = targetY + (Math.random() * 100 - 50);
 
@@ -1295,12 +1295,12 @@
                             heart.remove();
                             styleSheet.remove();
                         }, duration * 1000 - 100);
-                    }, i * 200); // Disparar un corazÃ³n cada 200ms
+                    }, i * 200); // Disparar un corazón cada 200ms
                 }
             }
 
             function createHeartBurst(x, y) {
-                const hearts = ['ðŸ’–', 'ðŸ’—', 'ðŸ’“', 'ðŸ’ž', 'ðŸ’•', 'ðŸ’˜'];
+                const hearts = ['💖', '💗', '💓', '💞', '💕', '💘'];
                 const numBursts = 4 + Math.floor(Math.random() * 3);
                 for (let i = 0; i < numBursts; i++) {
                     const heart = document.createElement('div');
