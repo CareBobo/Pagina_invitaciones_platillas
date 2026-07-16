@@ -562,3 +562,25 @@ body {
     width: 0px;
     background: transparent;
 }
+.flip-book {
+    transition: transform 0.8s ease-in-out;
+}
+
+.flip-book.closed-scale-front,
+.flip-book.closed-scale-back {
+    transform: scale(0.75);
+}
+
+.flip-book.book-open-scale {
+    transform: scale(1);
+}
+
+@media (min-width: 769px) {
+    .flip-book.closed-scale-front {
+        transform: scale(0.75) translateX(-25%);
+    }
+
+    .flip-book.closed-scale-back {
+        transform: scale(0.75) translateX(25%);
+    }
+}
