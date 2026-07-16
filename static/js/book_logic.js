@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.pageFlip = new St.PageFlip(flipBookElement, {
             width: pageW,
             height: pageH,
-            size: "stretch",
+            size: "fit",
             minWidth: 200,
             maxWidth: 600,
             minHeight: 280,
