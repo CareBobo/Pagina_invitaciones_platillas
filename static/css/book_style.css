@@ -325,22 +325,7 @@ body {
     transition: transform 0.8s ease-in-out;
 }
 
-.flip-book.closed-scale-front,
-.flip-book.closed-scale-back {
-    transform: scale(1);
-    /* Se ajusta perfectamente al contenedor */
-}
 
-/* En computadoras o landscape, la portada está del lado derecho, y contraportada del izquierdo */
-@media (min-width: 769px) {
-    .flip-book.closed-scale-front {
-        transform: scale(1) translateX(-25%);
-    }
-
-    .flip-book.closed-scale-back {
-        transform: scale(1) translateX(25%);
-    }
-}
 
 .page {
     background-color: #122840; /* Deep elegant royal blue leather */
