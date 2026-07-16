@@ -29,6 +29,60 @@ document.addEventListener('DOMContentLoaded', () => {
     mainContainer.style.display = 'flex';
     initBook();
 
+    // Función para calcular y aplicar el tamaño
+    function updateBookScale(isClosed, isBack = false) {
+        const ww = window.innerWidth;
+        const wh = window.innerHeight;
+        
+        // Si isPortraitMobile es true, el libro siempre es 350 de ancho.
+        // Si es false, el libro abierto mide 700 de ancho, cerrado mide 350 visualmente (pero el contenedor es 700).
+        const bookW = isPortraitMobile ? 350 : 700;
+        const bookH = 500;
+        
+        // Factor de escala para que quepa en pantalla (dejando un margen)
+        // En móviles verticales damos un poco más de ancho (0.95), en horizontal 0.9.
+        const marginW = isPortraitMobile ? 0.95 : 0.9;
+        const marginH = isPortraitMobile ? 0.9 : 0.95;
+        
+        // Calculamos cuánto debemos encoger o agrandar el libro para que quepa
+        // El ancho visual del libro cuando está cerrado en landscape es 350 (la mitad).
+        const visualW = (isClosed && !isPortraitMobile) ? 350 : bookW;
+        
+        const scaleW = (ww * marginW) / visualW;
+        const scaleH = (wh * marginH) / bookH;
+        
+        let scale = Math.min(scaleW, scaleH);
+        
+        // Hacerlo un poco más pequeño cuando está cerrado
+        if (isClosed) {
+            scale = scale * 0.85; 
+        }
+
+        // Aplicar la escala y la traslación para centrar la portada/contraportada
+        let transformStr = `scale(${scale})`;
+        
+        if (isClosed && !isPortraitMobile) {
+            if (isBack) {
+                transformStr += ` translateX(25%)`;
+            } else {
+                transformStr += ` translateX(-25%)`;
+            }
+        }
+        
+        flipBookElement.style.transform = transformStr;
+    }
+
+    // Escuchar cambios de tamaño de ventana
+    window.addEventListener('resize', () => {
+        if (window.pageFlip) {
+            const current = window.pageFlip.getCurrentPageIndex();
+            const total = window.pageFlip.getPageCount();
+            const isClosed = current === 0 || current === total - 1;
+            const isBack = current === total - 1;
+            updateBookScale(isClosed, isBack);
+        }
+    });
+
     // Toggle Inventario
     if (toggleBtn && closeBtn) {
         toggleBtn.addEventListener('click', () => {
@@ -51,11 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.pageFlip = new St.PageFlip(flipBookElement, {
             width: pageW,
             height: pageH,
-            size: "stretch", // stretch ajusta el libro al contenedor manteniendo la proporción
-            minWidth: 150,
-            maxWidth: 600,
-            minHeight: 150,
-            maxHeight: 850,
+            size: "fixed", // Fijo: nosotros controlamos el zoom con CSS transform para no romper los textos
+            minWidth: 350,
+            maxWidth: 350,
+            minHeight: 500,
+            maxHeight: 500,
             drawShadow: true,
             showCover: true,
             usePortrait: isPortraitMobile, 
@@ -67,9 +121,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const pages = document.querySelectorAll('.page');
         window.pageFlip.loadFromHTML(pages);
 
-        // El libro empieza pequeño (cerrado)
-        flipBookElement.classList.add('closed-scale-front');
+        // El libro empieza cerrado
         flipBookElement.style.display = 'block';
+        updateBookScale(true, false);
 
         // Ocultar swipeHint al tocar
         flipBookElement.addEventListener('pointerdown', () => {
@@ -81,26 +135,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Evento al pasar página para controlar el tamaño y música
         window.pageFlip.on('flip', (e) => {
-            // Ocultar hint
-            if (swipeHint) {
-                swipeHint.classList.add('hidden');
-                setTimeout(() => swipeHint.style.display = 'none', 500);
-            }
-
             const totalPages = window.pageFlip.getPageCount();
-            flipBookElement.classList.remove('closed-scale-front', 'closed-scale-back');
-
-            // Si está en la portada (página 0), centrar y achicar
+            
+            // Si está en la portada (página 0) o contraportada
             if (e.data === 0) {
-                flipBookElement.classList.add('closed-scale-front');
-                // Si está en la contraportada (libro totalmente cerrado al final)
+                updateBookScale(true, false);
+                if (swipeHint) {
+                    swipeHint.style.display = 'flex';
+                    setTimeout(() => swipeHint.classList.remove('hidden'), 50);
+                }
             } else if (e.data === totalPages - 1) {
-                flipBookElement.classList.add('closed-scale-back');
-
+                updateBookScale(true, true);
+                if (swipeHint) {
+                    swipeHint.classList.add('hidden');
+                    setTimeout(() => swipeHint.style.display = 'none', 500);
+                }
+                
                 // Regresar a la portada sin hacer giros 3D extremos
                 setTimeout(() => {
                     window.pageFlip.flip(0); // Ir a página 0
                 }, 1500);
+            } else {
+                // Libro abierto
+                updateBookScale(false, false);
+                if (swipeHint) {
+                    swipeHint.classList.add('hidden');
+                    setTimeout(() => swipeHint.style.display = 'none', 500);
+                }
             }
 
             // Iniciar música y video en la primera interacción
