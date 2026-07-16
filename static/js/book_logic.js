@@ -51,14 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
         window.pageFlip = new St.PageFlip(flipBookElement, {
             width: pageW,
             height: pageH,
-            size: "fit", // 'fit' garantiza que nunca se corte, siempre se ajusta al tamaño de la pantalla
-            minWidth: 200,
+            size: "stretch", // stretch ajusta el libro al contenedor manteniendo la proporción
+            minWidth: 150,
             maxWidth: 600,
-            minHeight: 280,
+            minHeight: 150,
             maxHeight: 850,
             drawShadow: true,
             showCover: true,
-            usePortrait: isPortraitMobile, // En horizontal (landscape) se verán 2 páginas como la segunda foto
+            usePortrait: isPortraitMobile, 
             mobileScrollSupport: false,
             maxShadowOpacity: 0.5,
             flippingTime: 1000
