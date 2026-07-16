@@ -13,10 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let isMusicPlaying = false;
     let musicStarted = false;
 
-    // Calcular dimensiones responsivas (STRETCH mode)
-    let isMobile = window.innerWidth <= 768;
-    let pageW = isMobile ? window.innerWidth * 0.85 : 350;
-    let pageH = isMobile ? window.innerHeight * 0.75 : 500;
+    // Calcular dimensiones base del libro (aspect ratio)
+    // En móviles verticales queremos que sea casi todo el ancho, en apaisado queremos que se vea completo.
+    let isPortraitMobile = window.innerWidth < window.innerHeight && window.innerWidth <= 768;
+    
+    // El tamaño base del libro. Al usar size: "fit", el libro se escalará para caber siempre en la pantalla
+    // manteniendo esta proporción (ej. 350x500 = aspecto 7:10).
+    let pageW = 350;
+    let pageH = 500;
 
     // Inicializar stPageFlip
     let pageFlip;
@@ -47,14 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
         window.pageFlip = new St.PageFlip(flipBookElement, {
             width: pageW,
             height: pageH,
-            size: "stretch",
-            minWidth: 280,
-            maxWidth: 450,
-            minHeight: 400,
-            maxHeight: 650,
+            size: "fit", // 'fit' garantiza que nunca se corte, siempre se ajusta al tamaño de la pantalla
+            minWidth: 200,
+            maxWidth: 600,
+            minHeight: 280,
+            maxHeight: 850,
             drawShadow: true,
             showCover: true,
-            usePortrait: isMobile,
+            usePortrait: isPortraitMobile, // En horizontal (landscape) se verán 2 páginas como la segunda foto
             mobileScrollSupport: false,
             maxShadowOpacity: 0.5,
             flippingTime: 1000

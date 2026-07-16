@@ -326,18 +326,18 @@ body {
 
 .flip-book.closed-scale-front,
 .flip-book.closed-scale-back {
-    transform: scale(1.15);
-    /* Se ve pequeño cerrado */
+    transform: scale(1);
+    /* Se ajusta perfectamente al contenedor */
 }
 
-/* En computadoras, la portada está del lado derecho, y contraportada del izquierdo */
+/* En computadoras o landscape, la portada está del lado derecho, y contraportada del izquierdo */
 @media (min-width: 769px) {
     .flip-book.closed-scale-front {
-        transform: scale(1.15) translateX(-25%);
+        transform: scale(1) translateX(-25%);
     }
 
     .flip-book.closed-scale-back {
-        transform: scale(1.15) translateX(25%);
+        transform: scale(1) translateX(25%);
     }
 }
 
