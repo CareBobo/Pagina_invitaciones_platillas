@@ -11,7 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let isMusicPlaying = false;
     let musicStarted = false;
 
-    let isPortraitMobile = window.innerWidth < window.innerHeight && window.innerWidth <= 768;
+    // Ya no usamos isPortraitMobile para el libro, siempre mostramos 2 páginas (usePortrait: false)
+    // porque en celulares forzamos al usuario a rotar a landscape (horizontal)
     
     let pageW = 350;
     let pageH = 500;
@@ -49,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             maxHeight: 850,
             drawShadow: true,
             showCover: true,
-            usePortrait: isPortraitMobile, 
+            usePortrait: false, // Siempre 2 páginas en formato horizontal
             mobileScrollSupport: false,
             maxShadowOpacity: 0.5,
             flippingTime: 1000
