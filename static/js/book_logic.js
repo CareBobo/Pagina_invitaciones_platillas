@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ya no usamos isPortraitMobile para el libro, siempre mostramos 2 páginas (usePortrait: false)
     // porque en celulares forzamos al usuario a rotar a landscape (horizontal)
     
-    let pageW = 350;
-    let pageH = 500;
+    let pageW = 450;
+    let pageH = 650;
 
     let pageFlip;
 
