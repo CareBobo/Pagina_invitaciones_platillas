@@ -44,10 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
             width: pageW,
             height: pageH,
             size: "fit",
-            minWidth: 200,
-            maxWidth: 600,
-            minHeight: 280,
-            maxHeight: 850,
             drawShadow: true,
             showCover: true,
             usePortrait: false, // Siempre 2 páginas en formato horizontal
