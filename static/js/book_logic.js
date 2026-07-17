@@ -43,7 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.pageFlip = new St.PageFlip(flipBookElement, {
             width: pageW,
             height: pageH,
-            size: "fit",
+            size: "stretch",
+            minWidth: 100,
+            maxWidth: 2000,
+            minHeight: 100,
+            maxHeight: 2000,
             drawShadow: true,
             showCover: true,
             usePortrait: false, // Siempre 2 páginas en formato horizontal
@@ -51,6 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
             maxShadowOpacity: 0.5,
             flippingTime: 1000
         });
+        
+        // Initial resize
+        resizeBook();
 
         const pages = document.querySelectorAll('.page');
         window.pageFlip.loadFromHTML(pages);
@@ -142,3 +149,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+function resizeBook() {
+    let availableW = window.innerWidth * 0.90; 
+    let availableH = window.innerHeight * 0.75; 
+    
+    // We want to fit exactly an aspect ratio of 900:650
+    let scale = Math.min(availableW / 900, availableH / 650);
+    
+    let targetW = 900 * scale;
+    let targetH = 650 * scale;
+    
+    let wrapper = document.querySelector('.book-3d-wrapper');
+    if (wrapper) {
+        wrapper.style.width = targetW + 'px';
+        wrapper.style.height = targetH + 'px';
+        wrapper.style.maxWidth = 'none';
+        wrapper.style.maxHeight = 'none';
+    }
+    
+    let flipBook = document.getElementById('flip-book');
+    if (flipBook) {
+        flipBook.style.fontSize = (16 * Math.max(scale, 0.4)) + 'px';
+    }
+    
+    if (window.pageFlip) {
+        window.pageFlip.update();
+    }
+}
+window.addEventListener('resize', resizeBook);
