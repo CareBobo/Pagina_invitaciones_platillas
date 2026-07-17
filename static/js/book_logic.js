@@ -1,4 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Override prototype methods to prevent premature update/resize crashes
+    if (window.St && window.St.PageFlip) {
+        St.PageFlip.prototype.getRender = function() {
+            return this.render || { update: () => {} };
+        };
+        const originalUpdate = St.PageFlip.prototype.update;
+        St.PageFlip.prototype.update = function() {
+            if (this.render && this.pages) {
+                originalUpdate.apply(this);
+            }
+        };
+    }
+
     const flipBookElement = document.getElementById('flip-book');
     const mainContainer = document.getElementById('main-container');
     const audio = document.getElementById('bg-music');
@@ -40,6 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initBook() {
         if (window.pageFlip) return;
+
+        // Make the element visible before initializing PageFlip to ensure correct dimensions
+        flipBookElement.style.display = 'block';
+
         window.pageFlip = new St.PageFlip(flipBookElement, {
             width: pageW,
             height: pageH,
@@ -55,15 +72,14 @@ document.addEventListener('DOMContentLoaded', () => {
             maxShadowOpacity: 0.5,
             flippingTime: 1000
         });
-        
-        // Initial resize
-        resizeBook();
 
         const pages = document.querySelectorAll('.page');
         window.pageFlip.loadFromHTML(pages);
 
+        // Initial resize
+        resizeBook();
+
         flipBookElement.classList.add('closed-scale-front');
-        flipBookElement.style.display = 'block';
 
         flipBookElement.addEventListener('pointerdown', () => {
             if (swipeHint && !swipeHint.classList.contains('hidden')) {
@@ -173,7 +189,11 @@ function resizeBook() {
     }
     
     if (window.pageFlip) {
-        window.pageFlip.update();
+        try {
+            window.pageFlip.update();
+        } catch (e) {
+            console.warn("Could not update pageFlip:", e);
+        }
     }
 }
 window.addEventListener('resize', resizeBook);
