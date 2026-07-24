@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{{ invitacion.titulo }} - Libro Mágico</title>
 
-    <link rel="stylesheet" href="/static/css/book_style.css?v=13">
+    <link rel="stylesheet" href="/static/css/book_style.css?v=14">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts: Great Vibes para cursiva bonita, Montserrat para texto limpio -->
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;600&display=swap"
@@ -252,7 +252,8 @@
 
         <div class="book-3d-wrapper"
             style="position: relative; width: 90vw; height: 75vh; max-width: 1000px; max-height: 75vh; transform: rotateX(5deg); border-radius: 5px; margin: 0 auto 20px auto;">
-            <div class="flip-book" id="flip-book" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+            <div class="flip-book" id="flip-book"
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
 
                 <!-- PORTADA (Página 0) -->
                 <div class="page page-cover page-cover-top" data-density="hard">
@@ -359,28 +360,28 @@
 
                         <div style="flex-grow: 1; width: 100%; position: relative; z-index: 5; margin-bottom: 10px;">
 
-                            <!-- Foto 1: Derecha Arriba (Marco Vertical) -->
+                            <!-- Foto 1: Medio Izquierda (Marco Horizontal 2) -->
                             <div
-                                style="position: absolute; top: 15%; right: 8%; width: 95px; height: 90px; z-index: 5; top: -3px; right: -14px;">
+                                style="position: absolute; top: 49%; left: 14%; width: 38%; height: 15%; z-index: 5;">
                                 <img class="zoomable"
                                     src="{{ ('/static/' + invitacion.historia_foto_1_url) if invitacion.historia_foto_1_url else '/static/assets/portada_libro.jpg' }}"
-                                    style="width: 100%; height: 100%; object-fit: contain; cursor: pointer;">
+                                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 3px; cursor: pointer;">
                             </div>
 
-                            <!-- Foto 2: Izquierda Medio (Marco Horizontal) -->
+                            <!-- Foto 2: Arriba Izquierda (Marco Horizontal 1) -->
                             <div
-                                style="position: absolute; top: 40%; left: 12%; width: 138px; height: 130px; z-index: 5; top: -3px; right: -1px;">
+                                style="position: absolute; top: 31%; left: 14%; width: 38%; height: 15%; z-index: 5;">
                                 <img class="zoomable"
                                     src="{{ ('/static/' + invitacion.historia_foto_3_url) if invitacion.historia_foto_3_url else '/static/assets/portada_libro.jpg' }}"
-                                    style="width: 100%; height: 100%; object-fit: contain; cursor: pointer;">
+                                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 3px; cursor: pointer;">
                             </div>
 
-                            <!-- Foto 3: Derecha Abajo (Marco Vertical) -->
+                            <!-- Foto 3: Arriba Derecha (Marco Vertical 1) -->
                             <div
-                                style="position: absolute; top: 60%; right: 8%; width: 95px; height: 90px; z-index: 5; top: 113px; right: -14px;">
+                                style="position: absolute; top: 30%; right: 10%; width: 26%; height: 25%; z-index: 5;">
                                 <img class="zoomable"
                                     src="{{ ('/static/' + invitacion.historia_foto_2_url) if invitacion.historia_foto_2_url else '/static/assets/portada_libro.jpg' }}"
-                                    style="width: 100%; height: 100%; object-fit: contain; cursor: pointer;">
+                                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 3px; cursor: pointer;">
                             </div>
 
                             <!-- Texto Animado: Izquierda Abajo (Marco Horizontal) -->
@@ -1338,7 +1339,7 @@
     </script>
 
     <script src="/static/js/particles_effects.js?v=6"></script>
-    <script src="/static/js/book_logic.js?v=16"></script>
+    <script src="/static/js/book_logic.js?v=17"></script>
 </body>
 
 </html>
