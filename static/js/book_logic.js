@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mobileScrollSupport: false,
             maxShadowOpacity: 0.5,
             flippingTime: 1000,
-            autoCenter: false
+            autoCenter: true
         });
 
         const pages = document.querySelectorAll('.page');
@@ -227,21 +227,9 @@ function resizeBook(targetPage) {
         wrapper.style.maxWidth = 'none';
         wrapper.style.maxHeight = 'none';
 
-        // Fix centering: shift wrapper based on current page
-        if (window.pageFlip) {
-            if (currentPage === 0) {
-                // Front cover
-                wrapper.style.transform = `rotateX(5deg) translateX(-${targetW * 0.25}px)`;
-            } else if (currentPage === totalPages - 1 && totalPages > 0) {
-                // Back cover
-                wrapper.style.transform = `rotateX(5deg) translateX(${targetW * 0.25}px)`;
-            } else {
-                // Open book
-                wrapper.style.transform = 'rotateX(5deg) translateX(0px)';
-            }
-        } else {
-            // Default before fully initialized
-            wrapper.style.transform = `rotateX(5deg) translateX(-${targetW * 0.25}px)`;
+        // Apply 3D rotation without manual translation, let autoCenter handle it
+        if (wrapper) {
+            wrapper.style.transform = 'rotateX(5deg)';
         }
 
         // Add a smooth CSS transition to the wrapper
