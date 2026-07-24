@@ -565,20 +565,7 @@ body {
     background: transparent;
 }
 
-/* Restored transform scale and translate classes to center the book cover when closed */
-.flip-book.closed-scale-front,
-.flip-book.closed-scale-back {
-    transform: scale(0.7);
-}
 
-@media (min-width: 769px) {
-    .flip-book.closed-scale-front {
-        transform: scale(0.7) translateX(-25%);
-    }
-    .flip-book.closed-scale-back {
-        transform: scale(0.7) translateX(25%);
-    }
-}
 
 /* Style for index button when the book is open */
 #btn-index-bottom {

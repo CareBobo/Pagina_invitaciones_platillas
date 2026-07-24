@@ -80,8 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initial resize
         resizeBook();
 
-        flipBookElement.classList.add('closed-scale-front');
-
         // Allow opening the book by clicking/tapping anywhere on the closed cover
         flipBookElement.addEventListener('click', (e) => {
             if (window.pageFlip) {
@@ -109,12 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const totalPages = window.pageFlip.getPageCount();
-            flipBookElement.classList.remove('closed-scale-front', 'closed-scale-back', 'book-open-scale');
 
             const menuBtn = document.getElementById('btn-index-bottom');
 
             if (e.data === 0) {
-                flipBookElement.classList.add('closed-scale-front');
                 if (swipeHint) {
                     swipeHint.style.display = 'flex';
                     setTimeout(() => swipeHint.classList.remove('hidden'), 50);
@@ -123,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     menuBtn.classList.remove('open-book-menu');
                 }
             } else if (e.data === totalPages - 1) {
-                flipBookElement.classList.add('closed-scale-back');
                 if (swipeHint) {
                     swipeHint.style.display = 'none';
                 }
@@ -134,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.pageFlip.flip(0);
                 }, 1500);
             } else {
-                flipBookElement.classList.add('book-open-scale');
                 if (swipeHint) {
                     swipeHint.style.display = 'none';
                 }
