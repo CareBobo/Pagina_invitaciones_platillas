@@ -362,23 +362,21 @@
 
                             <!-- Foto 1: Medio Izquierda (Marco Horizontal 2) -->
                             <div
-                                style="position: absolute; top: 49%; left: 14%; width: 38%; height: 15%; z-index: 5;">
+                                style="position: absolute; top: 40.5%; left: 21%; width: 38%; height: 20%; z-index: 5;">
                                 <img class="zoomable"
                                     src="{{ ('/static/' + invitacion.historia_foto_1_url) if invitacion.historia_foto_1_url else '/static/assets/portada_libro.jpg' }}"
                                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 3px; cursor: pointer;">
                             </div>
 
                             <!-- Foto 2: Arriba Izquierda (Marco Horizontal 1) -->
-                            <div
-                                style="position: absolute; top: 31%; left: 14%; width: 38%; height: 15%; z-index: 5;">
+                            <div style="position: absolute; top: 20%; left: 21%; width: 38%; height: 15%; z-index: 5;">
                                 <img class="zoomable"
                                     src="{{ ('/static/' + invitacion.historia_foto_3_url) if invitacion.historia_foto_3_url else '/static/assets/portada_libro.jpg' }}"
                                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 3px; cursor: pointer;">
                             </div>
 
                             <!-- Foto 3: Arriba Derecha (Marco Vertical 1) -->
-                            <div
-                                style="position: absolute; top: 30%; right: 10%; width: 26%; height: 25%; z-index: 5;">
+                            <div style="position: absolute; top: 18%; right: 3%; width: 26%; height: 65%; z-index: 5;">
                                 <img class="zoomable"
                                     src="{{ ('/static/' + invitacion.historia_foto_2_url) if invitacion.historia_foto_2_url else '/static/assets/portada_libro.jpg' }}"
                                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 3px; cursor: pointer;">
@@ -936,6 +934,39 @@
     <script>
         document.getElementById('btn-index-bottom').addEventListener('click', () => {
             document.getElementById('index-modal').style.display = 'flex';
+        });
+
+        // Lightbox logic for zoomable images
+        document.addEventListener('DOMContentLoaded', () => {
+            const lightbox = document.getElementById('lightbox-modal');
+            const content = document.getElementById('lightbox-content');
+            const closeBtn = document.getElementById('lightbox-close');
+
+            document.querySelectorAll('.zoomable').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent book flip
+                    
+                    if (this.tagName === 'IMG') {
+                        content.innerHTML = `<img src="${this.src}" style="max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 5px; box-shadow: 0 0 20px rgba(0,0,0,0.8);">`;
+                    } else if (this.tagName === 'VIDEO') {
+                        content.innerHTML = `<video src="${this.src}" controls autoplay style="max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 5px; box-shadow: 0 0 20px rgba(0,0,0,0.8);"></video>`;
+                    }
+                    
+                    lightbox.style.display = 'flex';
+                });
+            });
+
+            closeBtn.addEventListener('click', () => {
+                lightbox.style.display = 'none';
+                content.innerHTML = ''; // Clear to stop video
+            });
+
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) {
+                    lightbox.style.display = 'none';
+                    content.innerHTML = ''; // Clear to stop video
+                }
+            });
         });
     </script>
     <style>
