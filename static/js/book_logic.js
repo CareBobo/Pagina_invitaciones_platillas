@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Force dynamic resizing to smoothly animate scaling between open/closed states
-            resizeBook();
+            resizeBook(e.data);
 
             if (!musicStarted && audio) {
                 audio.play().then(() => {
@@ -196,13 +196,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-function resizeBook() {
+function resizeBook(targetPage) {
     let isOpen = false;
     let currentPage = 0;
     let totalPages = 0;
 
     if (window.pageFlip) {
-        currentPage = window.pageFlip.getCurrentPageIndex();
+        currentPage = typeof targetPage === 'number' ? targetPage : window.pageFlip.getCurrentPageIndex();
         totalPages = window.pageFlip.getPageCount();
         if (currentPage > 0 && currentPage < totalPages - 1) {
             isOpen = true;
