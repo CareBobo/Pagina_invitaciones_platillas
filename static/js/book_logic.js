@@ -232,7 +232,7 @@ function resizeBook(targetPage) {
         if (window.pageFlip) {
             if (currentPage === 0) {
                 // Portada
-                wrapper.style.transform = `rotateX(5deg) translateX(-${offset}px) scale(${scaleFactor})`;
+                wrapper.style.transform = `rotateX(5deg) translateX(calc(-${offset}px + 50px)) scale(${scaleFactor})`;
             } else if (currentPage === totalPages - 1 && totalPages > 0) {
                 // Contraportada
                 wrapper.style.transform = `rotateX(5deg) translateX(${offset}px) scale(${scaleFactor})`;
@@ -241,7 +241,7 @@ function resizeBook(targetPage) {
                 wrapper.style.transform = `rotateX(5deg) translateX(0px) scale(${scaleFactor})`;
             }
         } else {
-            wrapper.style.transform = `rotateX(5deg) translateX(-${offset}px) scale(${scaleFactor})`;
+            wrapper.style.transform = `rotateX(5deg) translateX(calc(-${offset}px + 50px)) scale(${scaleFactor})`;
         }
 
         // Animamos SOLAMENTE el transform (movimiento y escala), no el width/height.
