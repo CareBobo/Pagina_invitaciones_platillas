@@ -125,9 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (menuBtn) {
                     menuBtn.classList.remove('open-book-menu');
                 }
-                setTimeout(() => {
-                    window.pageFlip.flip(0);
-                }, 1500);
             } else {
                 if (swipeHint) {
                     swipeHint.style.display = 'none';
