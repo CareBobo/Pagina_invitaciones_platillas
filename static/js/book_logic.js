@@ -85,9 +85,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Allow opening the book by clicking/tapping anywhere on the closed cover
         flipBookElement.addEventListener('click', (e) => {
             if (window.pageFlip) {
+                // Prevenir doble-salto si la librería ya está animando la página
+                if (window.pageFlip.getState() === 'flipping') return;
+                
                 const currentPage = window.pageFlip.getCurrentPageIndex();
                 if (currentPage === 0) {
-                    window.pageFlip.flip(1);
+                    window.pageFlip.flipNext();
                 }
             }
         });
