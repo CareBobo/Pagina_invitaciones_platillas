@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Override prototype methods to prevent premature update/resize crashes
     if (window.St && window.St.PageFlip) {
-        St.PageFlip.prototype.getRender = function() {
-            return this.render || { update: () => {} };
+        St.PageFlip.prototype.getRender = function () {
+            return this.render || { update: () => { } };
         };
         const originalUpdate = St.PageFlip.prototype.update;
-        St.PageFlip.prototype.update = function() {
+        St.PageFlip.prototype.update = function () {
             if (this.render && this.pages) {
                 originalUpdate.apply(this);
             }
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Ya no usamos isPortraitMobile para el libro, siempre mostramos 2 páginas (usePortrait: false)
     // porque en celulares forzamos al usuario a rotar a landscape (horizontal)
-    
+
     let pageW = 450;
     let pageH = 650;
 
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mobileScrollSupport: false,
             maxShadowOpacity: 0.5,
             flippingTime: 1000,
-            autoCenter: true
+            autoCenter: false
         });
 
         const pages = document.querySelectorAll('.page');
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.pageFlip) {
                 // Prevenir doble-salto si la librería ya está animando la página
                 if (window.pageFlip.getState() === 'flipping') return;
-                
+
                 const currentPage = window.pageFlip.getCurrentPageIndex();
                 if (currentPage === 0) {
                     window.pageFlip.flipNext();
@@ -206,39 +206,54 @@ function resizeBook(targetPage) {
         }
     }
 
-    // Closed cover doesn't need to take as much screen width (single page layout).
-    // Open book has two pages side by side, so we expand the dimensions to maximum screen size!
-    let widthFactor = isOpen ? 0.98 : 0.85;
-    let heightFactor = isOpen ? 0.82 : 0.70;
-
-    let availableW = window.innerWidth * widthFactor; 
-    let availableH = window.innerHeight * heightFactor; 
+    // Calculamos el tamaño usando SIEMPRE el factor del libro abierto. 
+    // Así la caja no cambia de tamaño real y evitamos que las páginas se partan.
+    let availableW = window.innerWidth * 0.98; 
+    let availableH = window.innerHeight * 0.82; 
     
-    // We want to fit exactly an aspect ratio of 900:650
-    let scale = Math.min(availableW / 900, availableH / 650);
+    // Queremos mantener la proporción 900:650
+    let baseScale = Math.min(availableW / 900, availableH / 650);
     
-    let targetW = 900 * scale;
-    let targetH = 650 * scale;
+    let targetW = 900 * baseScale;
+    let targetH = 650 * baseScale;
     
     let wrapper = document.querySelector('.book-3d-wrapper');
     if (wrapper) {
+        // Fijamos el tamaño estático
         wrapper.style.width = targetW + 'px';
         wrapper.style.height = targetH + 'px';
         wrapper.style.maxWidth = 'none';
         wrapper.style.maxHeight = 'none';
 
-        // Apply 3D rotation without manual translation, let autoCenter handle it
-        if (wrapper) {
-            wrapper.style.transform = 'rotateX(5deg)';
+        // Definimos la escala (el zoom) dependiendo de si está abierto o cerrado
+        let scaleFactor = isOpen ? 1 : 0.85;
+
+        // Calculamos el 25% exacto en píxeles (evita bugs del navegador al cargar la página)
+        let offset = targetW * 0.25;
+
+        // Aplicamos centrado Y la escala de tamaño al mismo tiempo
+        if (window.pageFlip) {
+            if (currentPage === 0) {
+                // Portada
+                wrapper.style.transform = `rotateX(5deg) translateX(-${offset}px) scale(${scaleFactor})`;
+            } else if (currentPage === totalPages - 1 && totalPages > 0) {
+                // Contraportada
+                wrapper.style.transform = `rotateX(5deg) translateX(${offset}px) scale(${scaleFactor})`;
+            } else {
+                // Abierto
+                wrapper.style.transform = `rotateX(5deg) translateX(0px) scale(${scaleFactor})`;
+            }
+        } else {
+            wrapper.style.transform = `rotateX(5deg) translateX(-${offset}px) scale(${scaleFactor})`;
         }
 
-        // Add a smooth CSS transition to the wrapper
-        wrapper.style.transition = 'width 0.4s ease-out, height 0.4s ease-out, transform 0.4s ease-out';
+        // Animamos SOLAMENTE el transform (movimiento y escala), no el width/height.
+        wrapper.style.transition = 'transform 0.4s ease-out';
     }
     
     let flipBook = document.getElementById('flip-book');
     if (flipBook) {
-        flipBook.style.fontSize = (16 * Math.max(scale, 0.4)) + 'px';
+        flipBook.style.fontSize = (16 * Math.max(baseScale, 0.4)) + 'px';
     }
     
     if (window.pageFlip) {
