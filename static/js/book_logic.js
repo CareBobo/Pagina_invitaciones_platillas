@@ -70,7 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
             usePortrait: false, // Siempre 2 páginas en formato horizontal
             mobileScrollSupport: false,
             maxShadowOpacity: 0.5,
-            flippingTime: 1000
+            flippingTime: 1000,
+            autoCenter: false
         });
 
         const pages = document.querySelectorAll('.page');
@@ -197,9 +198,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 function resizeBook() {
     let isOpen = false;
+    let currentPage = 0;
+    let totalPages = 0;
+
     if (window.pageFlip) {
-        const currentPage = window.pageFlip.getCurrentPageIndex();
-        const totalPages = window.pageFlip.getPageCount();
+        currentPage = window.pageFlip.getCurrentPageIndex();
+        totalPages = window.pageFlip.getPageCount();
         if (currentPage > 0 && currentPage < totalPages - 1) {
             isOpen = true;
         }
@@ -225,8 +229,26 @@ function resizeBook() {
         wrapper.style.height = targetH + 'px';
         wrapper.style.maxWidth = 'none';
         wrapper.style.maxHeight = 'none';
+
+        // Fix centering: shift wrapper based on current page
+        if (window.pageFlip) {
+            if (currentPage === 0) {
+                // Front cover
+                wrapper.style.transform = `rotateX(5deg) translateX(-${targetW * 0.25}px)`;
+            } else if (currentPage === totalPages - 1 && totalPages > 0) {
+                // Back cover
+                wrapper.style.transform = `rotateX(5deg) translateX(${targetW * 0.25}px)`;
+            } else {
+                // Open book
+                wrapper.style.transform = 'rotateX(5deg) translateX(0px)';
+            }
+        } else {
+            // Default before fully initialized
+            wrapper.style.transform = `rotateX(5deg) translateX(-${targetW * 0.25}px)`;
+        }
+
         // Add a smooth CSS transition to the wrapper
-        wrapper.style.transition = 'width 0.4s ease-out, height 0.4s ease-out';
+        wrapper.style.transition = 'width 0.4s ease-out, height 0.4s ease-out, transform 0.4s ease-out';
     }
     
     let flipBook = document.getElementById('flip-book');
