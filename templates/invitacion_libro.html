@@ -800,7 +800,7 @@
                             style="position: absolute; bottom: 5px; left: 15px; width: 25px; height: 25px; border-bottom: 3px solid #d4af37; border-left: 3px solid #d4af37; border-bottom-left-radius: 3px; z-index: 3; box-shadow: -1px 1px 2px rgba(0,0,0,0.5);">
                         </div>
 
-                        <div style="text-align: center; margin-bottom: 20px; z-index: 5;">
+                        <div style="position: absolute; top: 8%; width: 100%; text-align: center; z-index: 5;">
                             <h3 class="title-shine"
                                 style="font-family: 'Great Vibes', cursive; font-size: 3.2rem; color: #ffffff; text-shadow: 2px 2px 8px rgba(0,0,0,0.6); margin: 0; line-height: 0.8; font-weight: normal; display: inline-block;">
                                 Confirmar</h3>
@@ -811,31 +811,27 @@
                         </div>
 
                         <!-- Panel 3D -->
+                        <!-- Panel 3D -->
                         <div class="asistencia-form-container"
-                            style="width: 85%; background: transparent; text-align: center; z-index: 5; margin-top: 50px;">
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;">
                             <form id="rsvp-book-form" class="book-form"
-                                style="display: flex; flex-direction: column; gap: 15px;">
+                                style="width: 100%; height: 100%; position: relative;">
                                 <input type="hidden" name="uuid" value="{{ invitado.uuid }}">
-                                <div style="text-align: left;">
-                                    <label
-                                        style="display: none; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">.</label>
-                                    <input type="text" value="{{ invitado.nombre }}" readonly
-                                        style="position: relative; top: -20px; left: 18px; width: 100%; padding: 8px; border-radius: 5px; border: none; background: transparent; color: #e2dfdf; font-family: 'Times New Roman', serif; font-size: 1.1rem; box-sizing: border-box; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
-                                </div>
-                                <div style="text-align: left;">
-                                    <label
-                                        style="display: none; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">.</label>
-                                    <select name="estado_rsvp" required
-                                        style="position: relative; top: -3px; left: 23px; width: 70%; padding: 7px; border-radius: 5px; border: none; background: #443232; color: #fff; font-family: 'Times New Roman', serif; font-size: 0.9rem; box-sizing: border-box; display: block;">
-                                        <option value="Confirmado">Sí, asistiré</option>
-                                        <option value="Rechazado">No podré asistir</option>
-                                    </select>
-                                </div>
+                                
+                                <input type="text" value="{{ invitado.nombre }}" readonly
+                                    style="position: absolute; top: 38%; left: 15%; width: 70%; padding: 8px; border-radius: 5px; border: none; background: transparent; color: #e2dfdf; font-family: 'Times New Roman', serif; font-size: 1.5rem; text-align: center; box-sizing: border-box; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); pointer-events: auto;">
+                                
+                                <select name="estado_rsvp" required
+                                    style="position: absolute; top: 58%; left: 15%; width: 70%; padding: 7px; border-radius: 5px; border: none; background: transparent; color: #fff; font-family: 'Times New Roman', serif; font-size: 1.3rem; text-align: center; box-sizing: border-box; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); pointer-events: auto;">
+                                    <option value="Confirmado" style="background: #443232;">Sí, asistiré</option>
+                                    <option value="Rechazado" style="background: #443232;">No podré asistir</option>
+                                </select>
+                                
                                 <button type="submit"
-                                    style="background: linear-gradient(to bottom, #0a0a09, #0c0c0b); color: #fff; padding: 10px; border-radius: 25px; border: none; font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.6), inset 0 2px 2px rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 2px; cursor: pointer; margin-top: 8px; width: 69%; align-self: center; position: relative; left: -10px; top: -13px;">Confirmar</button>
+                                    style="position: absolute; top: 78%; left: 20%; width: 60%; background: linear-gradient(to bottom, #0a0a09, #0c0c0b); color: #fff; padding: 10px; border-radius: 25px; border: none; font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.6), inset 0 2px 2px rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 2px; cursor: pointer; pointer-events: auto;">Confirmar</button>
                             </form>
                             <div id="rsvp-alert"
-                                style="display:none; text-align:center; margin-top:10px; font-size: 0.8rem; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                                style="position: absolute; top: 90%; width: 100%; display:none; text-align:center; font-size: 0.9rem; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); pointer-events: auto;">
                             </div>
                         </div>
                     </div>
