@@ -13,7 +13,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
 from config import Config
-from models import db, Usuario, Invitacion, CronogramaItem, Invitado, FotoGaleria, MusicaSugerida
+from models import db, Usuario, Invitacion, CronogramaItem, Invitado, FotoGaleria, MusicaSugerida, Rifa
 
 from supabase import create_client, Client
 
@@ -965,6 +965,62 @@ def eliminar_usuario(id):
 # ==========================================================================
 # INICIALIZACIÓN DE LA APLICACIÓN (SQLITE FALLBACK & SEEDING)
 # ==========================================================================
+
+# ==========================================================================
+# RUTAS DE ADMINISTRACIÓN DE RIFAS
+# ==========================================================================
+
+@app.route('/admin/rifas', methods=['GET', 'POST'])
+@login_required
+def admin_rifas():
+    if request.method == 'POST':
+        nueva_rifa = Rifa(
+            usuario_id=session['usuario_id'],
+            titulo=request.form['titulo'],
+            descripcion=request.form.get('descripcion'),
+            premio=request.form.get('premio'),
+            whatsapp_contacto=request.form.get('whatsapp_contacto')
+        )
+        if request.form.get('fecha_sorteo'):
+            nueva_rifa.fecha_sorteo = datetime.strptime(request.form['fecha_sorteo'], '%Y-%m-%dT%H:%M')
+            
+        db.session.add(nueva_rifa)
+        db.session.commit()
+        flash('¡Rifa creada con éxito!', 'success')
+        return redirect(url_for('admin_rifas'))
+        
+    rifas = Rifa.query.filter_by(usuario_id=session['usuario_id']).order_by(Rifa.created_at.desc()).all()
+    return render_template('admin/admin_rifas.html', rifas=rifas)
+
+
+@app.route('/admin/rifas/<int:id>/toggle', methods=['POST'])
+@login_required
+def toggle_rifa(id):
+    rifa = db.session.get(Rifa, id)
+    if rifa and (rifa.usuario_id == session['usuario_id'] or session.get('rol') == 'SUPER_ADMIN'):
+        rifa.activa = not rifa.activa
+        db.session.commit()
+        estado = 'activada' if rifa.activa else 'desactivada'
+        flash(f'La rifa ha sido {estado}.', 'success')
+    return redirect(url_for('admin_rifas'))
+
+
+# ==========================================================================
+# RUTAS PÚBLICAS DE RIFAS
+# ==========================================================================
+
+@app.route('/rifa/<token>')
+def ver_rifa(token):
+    rifa = Rifa.query.filter_by(token=token).first()
+    
+    if not rifa:
+        return render_template('404.html'), 404
+        
+    if not rifa.activa:
+        return render_template('rifa_finalizada.html', rifa=rifa)
+        
+    return render_template('rifa_activa.html', rifa=rifa)
+
 
 def init_db_seeds():
     """Crea un usuario administrador inicial 'admin' si la base de datos está vacía"""

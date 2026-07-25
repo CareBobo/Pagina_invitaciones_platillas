@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ rifa.titulo }} - Sorteo Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --secondary: #d946ef;
+            --bg: #f3f4f6;
+            --text: #1f2937;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            margin: 0;
+            padding: 0;
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .rifa-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin: 20px;
+        }
+        .rifa-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+        h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .premio-badge {
+            display: inline-block;
+            background: #fef3c7;
+            color: #d97706;
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            border: 1px solid #fde68a;
+        }
+        .descripcion {
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-size: 1.05rem;
+            text-align: left;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+        .whatsapp-btn {
+            display: inline-block;
+            background-color: #25D366;
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .whatsapp-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+        }
+        .whatsapp-btn i {
+            margin-right: 8px;
+            font-size: 1.3rem;
+        }
+        .fecha {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <div class="rifa-container">
+        <h1>{{ rifa.titulo }}</h1>
+        
+        {% if rifa.premio %}
+        <div class="premio-badge">
+            <i class="fas fa-gift"></i> Premio: {{ rifa.premio }}
+        </div>
+        {% endif %}
+        
+        <div class="descripcion">
+            {{ rifa.descripcion | replace('\n', '<br>') | safe if rifa.descripcion else '¡Participa en nuestra gran rifa!' }}
+        </div>
+        
+        {% if rifa.whatsapp_contacto %}
+        <a href="https://api.whatsapp.com/send?phone={{ rifa.whatsapp_contacto }}&text=%C2%A1Hola!%20Deseo%20participar%20en%20la%20rifa:%20{{ rifa.titulo | urlencode }}.%20Quiero%20el%20n%C3%BAmero..." target="_blank" class="whatsapp-btn">
+            <i class="fab fa-whatsapp"></i> Elegir Número y Enviar
+        </a>
+        <p style="font-size: 0.85rem; color: #6b7280; margin-top: 15px;">
+            Al hacer clic se abrirá WhatsApp para que envíes tu nombre, el número elegido y tu comprobante de pago.
+        </p>
+        {% endif %}
+        
+        {% if rifa.fecha_sorteo %}
+        <div class="fecha">
+            <i class="far fa-calendar-alt"></i> Fecha de Sorteo: {{ rifa.fecha_sorteo.strftime('%d/%m/%Y') }}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

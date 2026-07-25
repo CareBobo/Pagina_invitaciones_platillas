@@ -175,3 +175,18 @@ class MusicaSugerida(db.Model):
     artista = db.Column(db.String(200), nullable=False)
     sugerido_por = db.Column(db.String(200), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Rifa(db.Model):
+    __tablename__ = 'rifas'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id', ondelete='CASCADE'), nullable=False)
+    titulo = db.Column(db.String(200), nullable=False)
+    descripcion = db.Column(db.Text, nullable=True)
+    premio = db.Column(db.String(200), nullable=True)
+    fecha_sorteo = db.Column(db.DateTime, nullable=True)
+    whatsapp_contacto = db.Column(db.String(50), nullable=True)
+    token = db.Column(db.String(36), unique=True, nullable=False, default=lambda: str(uuid.uuid4()))
+    activa = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
