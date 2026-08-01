@@ -363,7 +363,7 @@
                             {% for foto in invitacion.fotos %}
                             <div
                                 style="position: relative; width: 80px; height: 80px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-light);">
-                                <img src="/static/{{ foto.foto_url }}"
+                                <img src="{{ foto.foto_url | media_url }}"
                                     style="width: 100%; height: 100%; object-fit: cover;">
                                 <a href="/admin/invitacion/{{ invitacion.id }}/foto/{{ foto.id }}/eliminar"
                                     style="position: absolute; top: 2px; right: 2px; background: rgba(239, 68, 68, 0.9); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; text-decoration: none;">&times;</a>

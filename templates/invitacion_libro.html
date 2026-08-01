@@ -312,7 +312,7 @@
                                 style="width: 100%; height: 100%; border: 3px solid #d4af37; box-shadow: inset 0 0 15px rgba(0,0,0,0.8); background: #000; position: relative; border-radius: 2px; overflow: hidden;">
                                 {% if invitacion.video_url %}
                                 <video id="main-video" class="zoomable" src="{{ invitacion.video_url | media_url }}"
-                                    autoplay loop playsinline muted
+                                    autoplay loop playsinline muted controls
                                     style="width: 100%; height: 100%; object-fit: contain; cursor: pointer;"></video>
                                 {% else %}
                                 <div
@@ -364,21 +364,21 @@
                             <div
                                 style="position: absolute; top: 40.5%; left: 21%; width: 38%; height: 20%; z-index: 5;">
                                 <img class="zoomable"
-                                    src="{{ ('/static/' + invitacion.historia_foto_1_url) if invitacion.historia_foto_1_url else '/static/assets/portada_libro.jpg' }}"
+                                    src="{{ invitacion.historia_foto_1_url | media_url if invitacion.historia_foto_1_url else '/static/assets/portada_libro.jpg' }}"
                                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 3px; cursor: pointer;">
                             </div>
 
                             <!-- Foto 2: Arriba Izquierda (Marco Horizontal 1) -->
                             <div style="position: absolute; top: 20%; left: 21%; width: 38%; height: 15%; z-index: 5;">
                                 <img class="zoomable"
-                                    src="{{ ('/static/' + invitacion.historia_foto_3_url) if invitacion.historia_foto_3_url else '/static/assets/portada_libro.jpg' }}"
+                                    src="{{ invitacion.historia_foto_3_url | media_url if invitacion.historia_foto_3_url else '/static/assets/portada_libro.jpg' }}"
                                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 3px; cursor: pointer;">
                             </div>
 
                             <!-- Foto 3: Arriba Derecha (Marco Vertical 1) -->
                             <div style="position: absolute; top: 18%; right: 4%; width: 24%; height: 65%; z-index: 5;">
                                 <img class="zoomable"
-                                    src="{{ ('/static/' + invitacion.historia_foto_2_url) if invitacion.historia_foto_2_url else '/static/assets/portada_libro.jpg' }}"
+                                    src="{{ invitacion.historia_foto_2_url | media_url if invitacion.historia_foto_2_url else '/static/assets/portada_libro.jpg' }}"
                                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 3px; cursor: pointer;">
                             </div>
 
@@ -609,22 +609,22 @@
                         {% if invitacion.fotos and invitacion.fotos|length >= 4 %}
                         <div
                             style="position: absolute; top: 23%; left: 10.5%; width: 30.5%; height: 32%; overflow: hidden; border-radius: 2px; box-shadow: 0 3px 8px rgba(0,0,0,0.7); z-index: 4;">
-                            <img class="zoomable" src="/static/{{ invitacion.fotos[0].foto_url }}"
+                            <img class="zoomable" src="{{ invitacion.fotos[0].foto_url | media_url }}"
                                 style="width: 100%; height: 80%; object-fit: cover; cursor: pointer;">
                         </div>
                         <div
                             style="position: absolute; top: 23%; left: 54.5%; width: 33.5%; height: 32%; overflow: hidden; border-radius: 2px; box-shadow: 0 3px 8px rgba(0,0,0,0.7); z-index: 4;">
-                            <img class="zoomable" src="/static/{{ invitacion.fotos[1].foto_url }}"
+                            <img class="zoomable" src="{{ invitacion.fotos[1].foto_url | media_url }}"
                                 style="width: 100%; height: 80%; object-fit: cover; cursor: pointer;">
                         </div>
                         <div
                             style="position: absolute; top: 56%; left: 10%; width: 31%; height: 33.5%; overflow: hidden; border-radius: 2px; box-shadow: 0 3px 8px rgba(0,0,0,0.7); z-index: 4;">
-                            <img class="zoomable" src="/static/{{ invitacion.fotos[2].foto_url }}"
+                            <img class="zoomable" src="{{ invitacion.fotos[2].foto_url | media_url }}"
                                 style="width: 100%; height: 80%; object-fit: cover; cursor: pointer;">
                         </div>
                         <div
                             style="position: absolute; top: 56%; left: 54.5%; width: 33%; height: 33.5%; overflow: hidden; border-radius: 2px; box-shadow: 0 3px 8px rgba(0,0,0,0.7); z-index: 4;">
-                            <img class="zoomable" src="/static/{{ invitacion.fotos[3].foto_url }}"
+                            <img class="zoomable" src="{{ invitacion.fotos[3].foto_url | media_url }}"
                                 style="width: 100%; height: 80%; object-fit: cover; cursor: pointer;">
                         </div>
                         {% else %}

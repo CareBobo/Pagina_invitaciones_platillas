@@ -62,11 +62,11 @@
             {% if invitacion.video_url %}
             <!-- Video difuminado en segundo plano para rellenar espacios -->
             <video class="video-bg-blur" autoplay loop muted playsinline>
-                <source src="/static/{{ invitacion.video_url }}" type="video/mp4">
+                <source src="{{ invitacion.video_url | media_url }}" type="video/mp4">
             </video>
             <!-- Video principal centrado y completo -->
             <video class="video-element" autoplay loop muted playsinline>
-                <source src="/static/{{ invitacion.video_url }}" type="video/mp4">
+                <source src="{{ invitacion.video_url | media_url }}" type="video/mp4">
                 Tu navegador no soporta reproducción de videos.
             </video>
             {% else %}

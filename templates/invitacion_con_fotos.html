@@ -278,7 +278,7 @@
         {% if invitacion.video_url %}
         <div style="width: 100%; position: relative; background-color: #1a1a1a; display: flex; justify-content: center;">
             <video controls autoplay loop muted playsinline style="width: 100%; height: auto; max-height: 85vh; object-fit: contain;">
-                <source src="/static/{{ invitacion.video_url }}" type="video/mp4">
+                <source src="{{ invitacion.video_url | media_url }}" type="video/mp4">
             </video>
         </div>
         {% endif %}
