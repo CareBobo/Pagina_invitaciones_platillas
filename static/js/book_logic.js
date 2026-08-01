@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             maxHeight: 2000,
             drawShadow: true,
             showCover: true,
-            usePortrait: false, // Siempre 2 páginas en formato horizontal
+            usePortrait: window.innerWidth < 900 && window.innerHeight > window.innerWidth, // Siempre 2 páginas en formato horizontal
             mobileScrollSupport: false,
             maxShadowOpacity: 0.5,
             flippingTime: 1000,
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stopPropagation = (e) => e.stopPropagation();
 
     const blockFlipOnElements = () => {
-        document.querySelectorAll('input, select, button, video, a, .zoomable, .content-box').forEach(el => {
+        document.querySelectorAll('input, select, button, a, .modal-button').forEach(el => {
             const events = ['pointerdown', 'pointerup', 'touchstart', 'touchend', 'mousedown', 'mouseup', 'click'];
             events.forEach(eventType => {
                 el.removeEventListener(eventType, stopPropagation);
@@ -195,6 +195,9 @@ function resizeBook(targetPage) {
     let currentPage = 0;
     let totalPages = 0;
 
+    let isMobile = window.innerWidth < 900;
+    let isPortrait = window.innerHeight > window.innerWidth;
+
     if (window.pageFlip) {
         currentPage = typeof targetPage === 'number' ? targetPage : window.pageFlip.getCurrentPageIndex();
         totalPages = window.pageFlip.getPageCount();
@@ -203,54 +206,52 @@ function resizeBook(targetPage) {
         }
     }
 
-    // Calculamos el tamaño usando SIEMPRE el factor del libro abierto. 
-    // Así la caja no cambia de tamaño real y evitamos que las páginas se partan.
+    // Adapt to portrait mode gracefully by allowing portrait orientation sizing
+    let targetRatioW = (isMobile && isPortrait) ? 450 : 900;
+    let targetRatioH = 650;
+
     let availableW = window.innerWidth * 0.98; 
-    let availableH = window.innerHeight * 0.82; 
+    let availableH = window.innerHeight * 0.85; 
     
-    // Queremos mantener la proporción 900:650
-    let baseScale = Math.min(availableW / 900, availableH / 650);
+    let baseScale = Math.min(availableW / targetRatioW, availableH / targetRatioH);
     
-    let targetW = 900 * baseScale;
-    let targetH = 650 * baseScale;
+    let targetW = targetRatioW * baseScale;
+    let targetH = targetRatioH * baseScale;
     
     let wrapper = document.querySelector('.book-3d-wrapper');
     if (wrapper) {
-        // Fijamos el tamaño estático
         wrapper.style.width = targetW + 'px';
         wrapper.style.height = targetH + 'px';
         wrapper.style.maxWidth = 'none';
         wrapper.style.maxHeight = 'none';
 
-        // Definimos la escala (el zoom) dependiendo de si está abierto o cerrado
-        let scaleFactor = isOpen ? 1 : 0.85;
+        // Avoid scaling down too much when closed to prevent it from looking tiny
+        let scaleFactor = isOpen ? 1 : 0.95;
 
-        // Calculamos el 25% exacto en píxeles (evita bugs del navegador al cargar la página)
-        let offset = targetW * 0.25;
-
-        // Aplicamos centrado Y la escala de tamaño al mismo tiempo
+        // Calculate offset based on desktop or mobile
         if (window.pageFlip) {
-            if (currentPage === 0) {
-                // Portada
-                wrapper.style.transform = `rotateX(5deg) translateX(calc(-${offset}px + 50px)) scale(${scaleFactor})`;
-            } else if (currentPage === totalPages - 1 && totalPages > 0) {
-                // Contraportada
-                wrapper.style.transform = `rotateX(5deg) translateX(${offset}px) scale(${scaleFactor})`;
+            if (isMobile && isPortrait) {
+                // Centered for mobile portrait
+                wrapper.style.transform = `rotateX(0deg) scale(${scaleFactor})`;
             } else {
-                // Abierto
-                wrapper.style.transform = `rotateX(5deg) translateX(0px) scale(${scaleFactor})`;
+                let offset = targetW * 0.25;
+                if (currentPage === 0) {
+                    wrapper.style.transform = `rotateX(5deg) translateX(calc(-${offset}px)) scale(${scaleFactor})`;
+                } else if (currentPage === totalPages - 1 && totalPages > 0) {
+                    wrapper.style.transform = `rotateX(5deg) translateX(${offset}px) scale(${scaleFactor})`;
+                } else {
+                    wrapper.style.transform = `rotateX(5deg) translateX(0px) scale(${scaleFactor})`;
+                }
             }
-        } else {
-            wrapper.style.transform = `rotateX(5deg) translateX(calc(-${offset}px + 50px)) scale(${scaleFactor})`;
         }
-
-        // Animamos SOLAMENTE el transform (movimiento y escala), no el width/height.
         wrapper.style.transition = 'transform 0.4s ease-out';
     }
     
     let flipBook = document.getElementById('flip-book');
     if (flipBook) {
-        flipBook.style.fontSize = (16 * Math.max(baseScale, 0.4)) + 'px';
+        // Cap the max font scale on mobile so text isn't huge
+        let fontScaleFactor = isMobile ? 0.75 : 1.0;
+        flipBook.style.fontSize = (16 * Math.max(baseScale, 0.4) * fontScaleFactor) + 'px';
     }
     
     if (window.pageFlip) {
