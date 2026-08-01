@@ -1409,6 +1409,43 @@
         window.open(waUrl, '_blank');
                 });
             }
+            
+            // Lógica del reloj de cuenta regresiva
+            const eventDateStr = document.getElementById('event-date')?.value;
+            const elDays = document.getElementById('cd-days');
+            const elHours = document.getElementById('cd-hours');
+            const elMins = document.getElementById('cd-mins');
+            const elSecs = document.getElementById('cd-secs');
+
+            if (eventDateStr && elDays && elHours && elMins && elSecs) {
+                const eventDate = new Date(eventDateStr).getTime();
+                
+                function updateTimer() {
+                    const now = new Date().getTime();
+                    const distance = eventDate - now;
+
+                    if (distance < 0) {
+                        elDays.innerText = "00";
+                        elHours.innerText = "00";
+                        elMins.innerText = "00";
+                        elSecs.innerText = "00";
+                        return;
+                    }
+
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const mins = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const secs = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    elDays.innerText = days.toString().padStart(2, '0');
+                    elHours.innerText = hours.toString().padStart(2, '0');
+                    elMins.innerText = mins.toString().padStart(2, '0');
+                    elSecs.innerText = secs.toString().padStart(2, '0');
+                }
+                
+                updateTimer();
+                setInterval(updateTimer, 1000);
+            }
         });
     </script>
 
